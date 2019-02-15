@@ -1,0 +1,10 @@
+ext {
+springBootVersion = '2.1.3.RELEASE'
+
+supportDependencies = [
+springBootStarterJersey         : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
+springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
+springBootStarterWeb            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+]
+}
