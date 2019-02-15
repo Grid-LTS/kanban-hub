@@ -1,0 +1,14 @@
+# IntelliJ IDEA
+#**/*.eml
+**/*.iml
+.idea
+
+### Build files
+**/.gradle
+**/build
+**/out
+
+
+### Checkstyle ###
+checkstyle/checkstyle-cache
+
