@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.1.3.RELEASE'
+    id 'org.springframework.boot' version '2.1.5.RELEASE'
     id 'java'
 }
 
@@ -7,8 +7,17 @@ apply plugin: 'io.spring.dependency-management'
 apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 
+bootJar {
+    baseName = 'kanban-hub-api'
+    version =  '0.1.0'
+    mainClassName = 'com.github.gridlts.khapi.KhapiApplication'
+}
+
+bootRun {
+    systemProperty "spring.config.additional-location", "file:./config/"
+}
+
 group 'com.github.gridlts'
-version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.11
 
@@ -16,5 +25,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat
-
 }
+
+task copyConfig(type: Copy) {
+    from("$projectDir") {
+        include "config/**/*.yml"
+    }
+    into "${project.buildDir}/libs"
+}
+
+tasks.jar.finalizedBy(copyConfig)
+
