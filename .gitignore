@@ -6,7 +6,9 @@
 ### Build files
 **/.gradle
 **/build
+!kh-client/build
 **/out
+
 
 
 ### Checkstyle ###
