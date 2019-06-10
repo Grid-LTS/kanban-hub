@@ -9,7 +9,9 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import Login from './components/Login';
+
 
 export default {
   name: 'App',
@@ -33,6 +35,9 @@ export default {
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateIsSignedIn);
         // Handle the initial sign-in state.
         this.updateIsSignedIn();
+        Object.defineProperty(Vue.prototype, '$auth', {
+          get() { return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true); },
+        });
       }, (error) => {
         this.error = JSON.stringify(error, null, 2);
       });

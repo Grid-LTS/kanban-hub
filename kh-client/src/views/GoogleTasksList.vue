@@ -1,26 +1,39 @@
 <template>
   <div>
-    Task
+    <ul>
+      <li v-for="item in taskLists" v-bind:key="item.id">
+        {{ item.title }}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import api from '../api';
+
 export default {
   name: 'GoogleTasksList',
+  data() {
+    return {
+      taskLists: [],
+    };
+  },
   methods: {
     listTaskLists() {
+      const that = this;
       this.$getGapiClient()
-        .then((gapi) => {
-          gapi.client.tasks.tasklists.list({
-            maxResults: 10,
-          }).then((response) => {
-            const taskLists = response.result.items;
-            taskLists.forEach((list) => {
-              gapi.client.tasks.tasks.list({ tasklist: list.id });
-            });
-          });
+        .then(() => {
+          const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
+          api.getGTaskLists(options).then(
+            (resp) => {
+              that.taskLists = resp.data;
+            },
+          );
         });
     },
+  },
+  created() {
+    this.listTaskLists();
   },
 };
 

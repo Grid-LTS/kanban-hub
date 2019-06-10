@@ -1,10 +1,18 @@
 ext {
-springBootVersion = '2.1.3.RELEASE'
+    springBootVersion = '2.1.5.RELEASE'
+    gapiVersion = '1.25.0'
+    googleTasksServiceVersion = 'v1-rev58-1.25.0'
+    springSecurityOauthVersion = "2.3.6.RELEASE"
 
 supportDependencies = [
-springBootStarterJersey         : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
-springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
-springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
-springBootStarterWeb            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+        springBootStarterJersey : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
+        springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+        springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
+        springBootStarterWeb            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+        springBootStarterSecurity       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
+        springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
+        googleApiClient                 : "com.google.api-client:google-api-client:${gapiVersion}",
+        googleOauthClientJetty          : "com.google.oauth-client:google-oauth-client-jetty:${gapiVersion}",
+        googleTasksService              : "com.google.apis:google-api-services-tasks:${googleTasksServiceVersion}"
 ]
 }
