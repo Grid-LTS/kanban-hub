@@ -25,6 +25,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat
+    implementation supportDependencies.googleApiClient
+    implementation supportDependencies.googleOauthClientJetty
+    implementation supportDependencies.googleTasksService
 }
 
 task copyConfig(type: Copy) {
