@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import GoogleTasksList from './views/GoogleTasksList';
+import GoogleTasksList from './views/GoogleTaskLists';
 
 Vue.use(Router);
 

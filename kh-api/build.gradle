@@ -28,7 +28,15 @@ dependencies {
     implementation supportDependencies.googleApiClient
     implementation supportDependencies.googleOauthClientJetty
     implementation supportDependencies.googleTasksService
+    implementation supportDependencies.openCSV
+    annotationProcessor supportDependencies.orgImmutables
+    compileOnly supportDependencies.orgImmutablesBuilder
+    compileOnly supportDependencies.orgImmutablesGson
+    compileOnly supportDependencies.orgImmutablesAnnotations
+    compileOnly supportDependencies.orgImmutablesAnnotate
 }
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
 
 task copyConfig(type: Copy) {
     from("$projectDir") {

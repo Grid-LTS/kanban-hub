@@ -3,6 +3,8 @@ ext {
     gapiVersion = '1.25.0'
     googleTasksServiceVersion = 'v1-rev58-1.25.0'
     springSecurityOauthVersion = "2.3.6.RELEASE"
+    orgImmutablesVersion = "2.7.4"
+    openCSVVersion = "4.6"
 
 supportDependencies = [
         springBootStarterJersey : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
@@ -13,6 +15,12 @@ supportDependencies = [
         springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
         googleApiClient                 : "com.google.api-client:google-api-client:${gapiVersion}",
         googleOauthClientJetty          : "com.google.oauth-client:google-oauth-client-jetty:${gapiVersion}",
-        googleTasksService              : "com.google.apis:google-api-services-tasks:${googleTasksServiceVersion}"
+        googleTasksService              : "com.google.apis:google-api-services-tasks:${googleTasksServiceVersion}",
+        orgImmutables                   : "org.immutables:value:${orgImmutablesVersion}",
+        orgImmutablesAnnotations        : "org.immutables:value:${orgImmutablesVersion}:annotations",
+        orgImmutablesBuilder            :  "org.immutables:builder:${orgImmutablesVersion}",
+        orgImmutablesGson               :  "org.immutables:gson:${orgImmutablesVersion}",
+        orgImmutablesAnnotate           : "org.immutables:annotate:${orgImmutablesVersion}",
+        openCSV                         :  "com.opencsv:opencsv:${openCSVVersion}"
 ]
 }

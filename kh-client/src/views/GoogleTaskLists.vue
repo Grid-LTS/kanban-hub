@@ -1,32 +1,36 @@
 <template>
   <div>
-    <ul>
-      <li v-for="item in taskLists" v-bind:key="item.id">
-        {{ item.title }}
-      </li>
-    </ul>
+    <div v-if="doneLoading">
+      <GoogleTaskList v-for="list in taskLists" v-bind:key="list.id"
+                      v-bind:task-list="list"></GoogleTaskList>
+    </div>
   </div>
 </template>
 
 <script>
 import api from '../api';
+import GoogleTaskList from '../components/GoogleTaskList';
 
 export default {
   name: 'GoogleTasksList',
+  components: {
+    GoogleTaskList,
+  },
   data() {
     return {
       taskLists: [],
+      doneLoading: false,
     };
   },
   methods: {
     listTaskLists() {
-      const that = this;
       this.$getGapiClient()
         .then(() => {
           const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
           api.getGTaskLists(options).then(
             (resp) => {
-              that.taskLists = resp.data;
+              this.taskLists = resp.data;
+              this.doneLoading = true;
             },
           );
         });
