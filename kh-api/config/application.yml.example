@@ -2,3 +2,6 @@ gtasks:
     api_key: <Google developer api key>
     client_id: <Google client id>
     scope: 'https://www.googleapis.com/auth/tasks.readonly'
+
+store:
+  path: "<where files go>"
