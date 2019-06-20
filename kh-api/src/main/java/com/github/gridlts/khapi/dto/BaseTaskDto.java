@@ -30,7 +30,12 @@ public abstract class BaseTaskDto {
     @InjectCsvBindByNameAnnotation
     public abstract SourceManager getSource();
 
-    public abstract List<String> tags();
+    @InjectCsvBindByNameAnnotation
+    @Nullable
+    public abstract String getProjectCode();
+
+    @InjectCsvBindAndSplitByNameAnnotation(elementType = String.class)
+    public abstract List<String> getTags();
 
     public static class Builder extends com.github.gridlts.khapi.dto.ImmutableBaseTaskDto.Builder {
     }

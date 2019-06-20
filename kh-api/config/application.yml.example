@@ -4,4 +4,4 @@ gtasks:
     scope: 'https://www.googleapis.com/auth/tasks.readonly'
 
 store:
-  path: "<where files go>"
+  path: "<dir where files go>"

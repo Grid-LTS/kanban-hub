@@ -30,14 +30,13 @@ export default {
   created() {
     this.$getGapiClient()
       .then((gapi) => {
-        this.gapi = gapi;
+        Object.defineProperty(Vue.prototype, '$auth', {
+          get() { return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true); },
+        });
         // Listen for sign-in state changes.
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateIsSignedIn);
         // Handle the initial sign-in state.
         this.updateIsSignedIn();
-        Object.defineProperty(Vue.prototype, '$auth', {
-          get() { return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true); },
-        });
       }, (error) => {
         this.error = JSON.stringify(error, null, 2);
       });

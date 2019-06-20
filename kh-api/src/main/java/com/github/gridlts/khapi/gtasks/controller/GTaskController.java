@@ -29,36 +29,36 @@ public class GTaskController {
         this.gTaskRepo = gTaskRepo;
     }
 
-    @RequestMapping(value="/properties", method = RequestMethod.GET)
+    @RequestMapping(value = "/properties", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> getProperties() {
-        Map<String, String> gTasksConfig = new HashMap<String,String>();
+        Map<String, String> gTasksConfig = new HashMap<String, String>();
         gTasksConfig.put("apiKey", gTasksProperties.getApiKey());
         gTasksConfig.put("scope", gTasksProperties.getScope());
         gTasksConfig.put("clientId", gTasksProperties.getClientId());
         return gTasksConfig;
     }
 
-    @RequestMapping(value="/tasklists", method = RequestMethod.GET)
+    @RequestMapping(value = "/tasklists", method = RequestMethod.GET)
     @ResponseBody
-    public List<TaskList> getTasklists(@RequestHeader(name="Authorization") String accessToken) throws IOException, GeneralSecurityException {
-        return gTaskRepo.getTaskLists(accessToken);
+    public List<TaskList> getTasklists(@RequestHeader(name = "Authorization") String accessToken) throws IOException, GeneralSecurityException {
+        return gTaskRepo.getTaskListsEntry(accessToken);
     }
 
-    @RequestMapping(value="/{taskListId}/tasks", method = RequestMethod.GET)
+    @RequestMapping(value = "/{taskListId}/tasks", method = RequestMethod.GET)
     @ResponseBody
     public List<Task> getTasksForTaskList(@PathVariable String taskListId,
-                                               @RequestHeader(name="Authorization") String accessToken)
-            throws IOException, GeneralSecurityException  {
-        return gTaskRepo.getTasksForTaskList(taskListId, accessToken, false);
+                                          @RequestHeader(name = "Authorization") String accessToken)
+            throws IOException, GeneralSecurityException {
+        return gTaskRepo.getTasksForTaskListEntry(taskListId, accessToken);
     }
 
-    @RequestMapping(value="/save/all", method = RequestMethod.POST)
+    @RequestMapping(value = "/save/all", method = RequestMethod.POST)
     @ResponseBody
-    public void saveAllTasks(@RequestHeader(name="Authorization") String accessToken)
+    public void saveAllTasks(@RequestHeader(name = "Authorization") String accessToken)
             throws IOException, GeneralSecurityException, CsvDataTypeMismatchException,
             CsvRequiredFieldEmptyException {
-        gTaskRepo.saveAllTasks(accessToken);
+        gTaskRepo.saveAllCompletedTasks(accessToken);
     }
 
 }
