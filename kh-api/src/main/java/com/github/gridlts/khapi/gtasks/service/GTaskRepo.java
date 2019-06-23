@@ -1,23 +1,14 @@
 package com.github.gridlts.khapi.gtasks.service;
 
 import com.github.gridlts.khapi.dto.BaseTaskDto;
-import com.github.gridlts.khapi.csv.CustomHeaderColumnNameMappingStrategy;
-import com.github.gridlts.khapi.dto.ImmutableBaseTaskDto;
+
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
 import com.google.api.services.tasks.model.TaskLists;
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -28,13 +19,7 @@ import static com.github.gridlts.khapi.types.SourceManager.GOOGLE_TASKS;
 @Service
 public class GTaskRepo {
 
-    private static final String COMPLETED_FILENAME = "completed.csv";
-    private static final String METADATA_TXT = "metadata.txt";
-
     private static final Long MAX_RESULTS = 10000L;
-
-    @Value("${store.path}")
-    private String storeDirectoryPath;
 
     private Tasks tasksService;
 
@@ -64,7 +49,7 @@ public class GTaskRepo {
     }
 
     public List<Task> getOpenTasksForTaskList(String taskListId)
-            throws IOException, GeneralSecurityException {
+            throws IOException {
         com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
                 .setMaxResults(MAX_RESULTS)
                 .setShowCompleted(false)
@@ -78,7 +63,7 @@ public class GTaskRepo {
 
 
     public List<Task> getCompletedTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime)
-            throws IOException, GeneralSecurityException {
+            throws IOException {
         com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
                 .setMaxResults(MAX_RESULTS)
                 .setCompletedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
@@ -91,49 +76,12 @@ public class GTaskRepo {
         return tasksForTaskList;
     }
 
-    public void saveAllCompletedTasks(String accessToken) throws IOException, GeneralSecurityException,
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        File f = new File(this.storeDirectoryPath + "/" + COMPLETED_FILENAME);
-        if (f.isDirectory()) {
-            throw new IOException(String.format("Cannot create file %s",
-                    this.storeDirectoryPath + "/" + COMPLETED_FILENAME));
-        }
+    public void instantiateGapiService(String accessToken) throws IOException, GeneralSecurityException {
         this.tasksService = GTasksApiService.instantiateGapiService(accessToken);
-        if (f.exists()) {
-            this.addRecentCompletedTasks();
-        } else {
-            this.saveAllTasksInitial();
-        }
-        try (OutputStream output = new FileOutputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            Properties metadata = new Properties();
-            long unixTime = System.currentTimeMillis();
-            metadata.setProperty("last_updated", Long.toString(unixTime));
-            metadata.store(output, null);
-        }
     }
 
-    public void addRecentCompletedTasks() throws IOException, GeneralSecurityException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        //readout properties
-        try (InputStream input = new FileInputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            Properties prop = new Properties();
-            prop.load(input);
-            String unixTimeString = prop.getProperty("last_updated");
-            long unixTime = Long.parseLong(unixTimeString, 10);
-            ZonedDateTime lastUpdatedTime = DateTimeHelper.convertUnixTimestampToZonedDateTime(unixTime);
-            List<BaseTaskDto> recentThan = this.getAllCompletedTasksNewerThan(lastUpdatedTime);
-            String append = this.writeToString(recentThan);
-            Files.write(Paths.get(this.storeDirectoryPath + "/" + COMPLETED_FILENAME), append.getBytes(), StandardOpenOption.APPEND);
-        }
-    }
-
-    public void saveAllTasksInitial() throws IOException, GeneralSecurityException,
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        List<BaseTaskDto> convertedTaskList = this.getAllCompletedTasksNewerThan(DateTimeHelper.getOldEnoughDate());
-        this.writeToCSVFile(convertedTaskList);
-    }
-
-    private List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime newerThanDateTime)
-            throws IOException, GeneralSecurityException {
+    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime newerThanDateTime)
+            throws IOException {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskList taskList : taskLists) {
@@ -159,26 +107,5 @@ public class GTaskRepo {
             }
         }
         return convertedTaskList;
-    }
-
-
-    private void writeToCSVFile(List<BaseTaskDto> allTasks) throws IOException,
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        Writer writer = new FileWriter(this.storeDirectoryPath + "/" + COMPLETED_FILENAME);
-        StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-        beanToCsv.write(allTasks);
-        writer.close();
-    }
-
-    private String writeToString(List<BaseTaskDto> allTasks) throws
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        StringWriter writer = new StringWriter();
-        // mapping of columns with their positions
-        CustomHeaderColumnNameMappingStrategy<BaseTaskDto> mappingStrategy = new CustomHeaderColumnNameMappingStrategy<BaseTaskDto>();
-        mappingStrategy.setType(ImmutableBaseTaskDto.class);
-        StatefulBeanToCsv<BaseTaskDto> beanToCsv = new StatefulBeanToCsvBuilder<BaseTaskDto>(writer)
-                .withMappingStrategy(mappingStrategy).build();
-        beanToCsv.write(allTasks);
-        return writer.toString();
     }
 }
