@@ -4,8 +4,6 @@ import com.github.gridlts.khapi.gtasks.GTasksProperties;
 import com.github.gridlts.khapi.gtasks.service.GTaskRepo;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -51,14 +49,6 @@ public class GTaskController {
                                           @RequestHeader(name = "Authorization") String accessToken)
             throws IOException, GeneralSecurityException {
         return gTaskRepo.getTasksForTaskListEntry(taskListId, accessToken);
-    }
-
-    @RequestMapping(value = "/save/all", method = RequestMethod.POST)
-    @ResponseBody
-    public void saveAllTasks(@RequestHeader(name = "Authorization") String accessToken)
-            throws IOException, GeneralSecurityException, CsvDataTypeMismatchException,
-            CsvRequiredFieldEmptyException {
-        gTaskRepo.saveAllCompletedTasks(accessToken);
     }
 
 }

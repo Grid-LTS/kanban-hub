@@ -24,7 +24,7 @@ export default {
     return {
       taskLists: [],
       doneLoading: false,
-      apiMessage:""
+      apiMessage: '',
     };
   },
   methods: {
@@ -44,10 +44,10 @@ export default {
       const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
       api.saveAllGTaskCompleted(options).then(
         (resp) => {
-          this.apiMessage = "Stored all completed tasks."
+          this.apiMessage = 'Stored all completed tasks.';
         },
       );
-    }
+    },
   },
   created() {
     this.listTaskLists();
