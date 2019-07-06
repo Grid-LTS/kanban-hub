@@ -68,6 +68,7 @@ public class GTaskRepo {
                 .setMaxResults(MAX_RESULTS)
                 .setCompletedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
                 .setShowCompleted(true)
+                .setShowHidden(true)
                 .execute();
         List<Task> tasksForTaskList = result.getItems();
         if (tasksForTaskList == null) {
