@@ -30,6 +30,7 @@ public class TaskRepo {
     private static final String COMPLETED_FILENAME = "completed.csv";
     private static final String METADATA_TXT = "metadata.txt";
 
+    private Properties metadata;
     @Value("${store.path}")
     private String storeDirectoryPath;
 
@@ -85,9 +86,9 @@ public class TaskRepo {
     public ZonedDateTime getLastUpdatedTime(String propertyName) throws IOException {
         //readout properties
         try (InputStream input = new FileInputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            Properties prop = new Properties();
-            prop.load(input);
-            String unixTimeString = prop.getProperty(propertyName);
+            this.metadata = new Properties();
+            this.metadata.load(input);
+            String unixTimeString = this.metadata.getProperty(propertyName);
             long unixTime = Long.parseLong(unixTimeString, 10);
             return DateTimeHelper.convertUnixTimestampToZonedDateTime(unixTime);
         }
@@ -95,10 +96,9 @@ public class TaskRepo {
 
     public void saveLastUpdatedTime(String propertyName) throws IOException {
         try (OutputStream output = new FileOutputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            Properties metadata = new Properties();
             long unixTime = System.currentTimeMillis();
-            metadata.setProperty(propertyName, Long.toString(unixTime));
-            metadata.store(output, null);
+            this.metadata.setProperty(propertyName, Long.toString(unixTime));
+            this.metadata.store(output, null);
         }
     }
 
