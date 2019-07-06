@@ -80,19 +80,19 @@ public class GTaskRepo {
         this.tasksService = GTasksApiService.instantiateGapiService(accessToken);
     }
 
-    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime newerThanDateTime)
+    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime)
             throws IOException {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskList taskList : taskLists) {
-            List<Task> tasks = this.getCompletedTasksForTaskList(taskList.getId(), newerThanDateTime);
+            List<Task> tasks = this.getCompletedTasksForTaskList(taskList.getId(), completedAfterDateTime);
             for (Task task : tasks) {
                 // consistency checks before conversion for saving to file
                 if (task.getCompleted() == null) {
                     continue;
                 }
                 ZonedDateTime taskDateTime = DateTimeHelper.convertGoogleTimeToZonedDateTime(task.getCompleted());
-                if (taskDateTime.isBefore(newerThanDateTime)) {
+                if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
                 BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()

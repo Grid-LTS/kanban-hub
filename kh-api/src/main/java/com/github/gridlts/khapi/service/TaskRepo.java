@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -56,32 +57,51 @@ public class TaskRepo {
         } else {
             this.saveAllTasksInitial();
         }
-        try (OutputStream output = new FileOutputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            Properties metadata = new Properties();
-            long unixTime = System.currentTimeMillis();
-            metadata.setProperty("last_updated", Long.toString(unixTime));
-            metadata.store(output, null);
-        }
     }
 
     public void addRecentCompletedTasks() throws IOException, CsvDataTypeMismatchException,
             CsvRequiredFieldEmptyException, GeneralSecurityException {
+        String entryTemplate = "last_updated_%s";
+        String gTaskTimeEntry = String.format(entryTemplate, "gtask");
+        String taskwTimeEntry = String.format(entryTemplate, "taskw");
+        ZonedDateTime gTaskedLastSavedTime = getLastUpdatedTime(gTaskTimeEntry);
+        List<BaseTaskDto> recentTasks = new ArrayList<>();
+        List<BaseTaskDto> recentGTaskTasks = this.gTaskRepo.getAllCompletedTasksNewerThan(gTaskedLastSavedTime);
+        ZonedDateTime taskwLastSavedTime = getLastUpdatedTime(taskwTimeEntry);
+        List<BaseTaskDto> recentTaskwTasks = this.taskwRepo.getAllCompletedTasksNewerThan(taskwLastSavedTime);
+        recentTasks.addAll(recentGTaskTasks);
+        recentTasks.addAll(recentTaskwTasks);
+        String append = this.writeToString(recentTasks);
+        Files.write(Paths.get(this.storeDirectoryPath + "/" + COMPLETED_FILENAME), append.getBytes(),
+                StandardOpenOption.APPEND);
+        if (recentGTaskTasks.size() > 0) {
+            saveLastUpdatedTime(gTaskTimeEntry);
+        }
+        if (recentTaskwTasks.size() > 0) {
+            saveLastUpdatedTime(taskwTimeEntry);
+        }
+    }
+
+    public ZonedDateTime getLastUpdatedTime(String propertyName) throws IOException {
         //readout properties
         try (InputStream input = new FileInputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
             Properties prop = new Properties();
             prop.load(input);
-            String unixTimeString = prop.getProperty("last_updated");
+            String unixTimeString = prop.getProperty(propertyName);
             long unixTime = Long.parseLong(unixTimeString, 10);
-            ZonedDateTime lastUpdatedTime = DateTimeHelper.convertUnixTimestampToZonedDateTime(unixTime);
-            List<BaseTaskDto> recentTasks = this.gTaskRepo.getAllCompletedTasksNewerThan(lastUpdatedTime);
-            List<BaseTaskDto> recentTaskwTasks = this.taskwRepo.getAllCompletedTasksNewerThan(lastUpdatedTime);
-            recentTasks.addAll(recentTaskwTasks);
-            String append = this.writeToString(recentTasks);
-            Files.write(Paths.get(this.storeDirectoryPath + "/" + COMPLETED_FILENAME), append.getBytes(),
-                    StandardOpenOption.APPEND);
+            return DateTimeHelper.convertUnixTimestampToZonedDateTime(unixTime);
         }
-
     }
+
+    public void saveLastUpdatedTime(String propertyName) throws IOException {
+        try (OutputStream output = new FileOutputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
+            Properties metadata = new Properties();
+            long unixTime = System.currentTimeMillis();
+            metadata.setProperty(propertyName, Long.toString(unixTime));
+            metadata.store(output, null);
+        }
+    }
+
 
     public void saveAllTasksInitial() throws IOException,
             CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
