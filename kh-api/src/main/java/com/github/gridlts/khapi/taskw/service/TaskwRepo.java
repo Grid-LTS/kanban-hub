@@ -50,15 +50,15 @@ public class TaskwRepo {
         return completedTaskw;
     }
 
-    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime newerThanDateTime) throws IOException {
-        List<TaskwDto> taskwTasks = getCompletedTaskwTasks(newerThanDateTime);
+    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime) throws IOException {
+        List<TaskwDto> taskwTasks = getCompletedTaskwTasks(completedAfterDateTime);
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskwDto taskwTask : taskwTasks) {
             // consistency checks before conversion for saving to file
             if (taskwTask.end() == null) {
                 continue;
             }
-            if (taskwTask.end().isBefore(newerThanDateTime)) {
+            if (taskwTask.end().isBefore(completedAfterDateTime)) {
                 continue;
             }
             BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
@@ -73,5 +73,10 @@ public class TaskwRepo {
         }
         return convertedTaskList;
     }
+
+    public void saveAllCompletedTasks() throws IOException {
+        this.getCompletedTaskwTasks(DateTimeHelper.getOldEnoughDate());
+    }
+
 
 }
