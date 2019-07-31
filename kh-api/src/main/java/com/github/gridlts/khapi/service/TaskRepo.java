@@ -5,7 +5,9 @@ import com.github.gridlts.khapi.dto.BaseTaskDto;
 import com.github.gridlts.khapi.dto.ImmutableBaseTaskDto;
 import com.github.gridlts.khapi.gtasks.service.DateTimeHelper;
 import com.github.gridlts.khapi.gtasks.service.GTaskRepo;
+import com.github.gridlts.khapi.resources.ITaskResourceRepo;
 import com.github.gridlts.khapi.taskw.service.TaskwRepo;
+import com.github.gridlts.khapi.resources.TaskResourceType;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -27,7 +29,7 @@ import java.util.Properties;
 @Service
 public class TaskRepo {
 
-    private static final String COMPLETED_FILENAME = "completed.csv";
+    private static final String COMPLETED_FILENAME_TEMPLATE = "%s_completed.csv";
     private static final String METADATA_TXT = "metadata.txt";
 
     private Properties metadata;
@@ -45,43 +47,57 @@ public class TaskRepo {
     }
 
     public void saveAllCompletedTasks(String accessToken) throws IOException, GeneralSecurityException,
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        File f = new File(this.storeDirectoryPath + "/" + COMPLETED_FILENAME);
-        if (f.isDirectory()) {
-            throw new IOException(String.format("Cannot create file %s",
-                    this.storeDirectoryPath + "/" + COMPLETED_FILENAME));
-        }
-        // initialize sessions with the services
+            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException  {
+        // initialize sessions of resources
         this.gTaskRepo.instantiateGapiService(accessToken);
+
+        this.saveAllCompletedTasksForType(TaskResourceType.GOOGLE_TASKS);
+        this.saveAllCompletedTasksForType(TaskResourceType.TASKWARRIOR);
+    }
+
+    public void saveAllCompletedTasksForType(TaskResourceType resourceType) throws IOException, GeneralSecurityException,
+            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+        String completedFilePath = getCompletionFilePath(resourceType);
+        File f = new File(completedFilePath);
+        if (f.isDirectory()) {
+            throw new IOException(String.format("Cannot create file %s", completedFilePath));
+        }
         if (f.exists()) {
-            this.addRecentCompletedTasks();
+            this.addRecentCompletedTasksForType(resourceType);
         } else {
-            this.saveAllTasksInitial();
+            this.saveAllTasksInitial(resourceType);
         }
     }
 
-    public void addRecentCompletedTasks() throws IOException, CsvDataTypeMismatchException,
+
+    public String getCompletionFilePath(TaskResourceType resourceType) {
+        return  this.storeDirectoryPath + "/" + String.format(COMPLETED_FILENAME_TEMPLATE, resourceType);
+    }
+
+    public void addRecentCompletedTasksForType(TaskResourceType resourceType) throws IOException, CsvDataTypeMismatchException,
             CsvRequiredFieldEmptyException, GeneralSecurityException {
         String entryTemplate = "last_updated_%s";
-        String gTaskTimeEntry = String.format(entryTemplate, "gtask");
-        String taskwTimeEntry = String.format(entryTemplate, "taskw");
-        ZonedDateTime gTaskedLastSavedTime = getLastUpdatedTime(gTaskTimeEntry);
-        List<BaseTaskDto> recentTasks = new ArrayList<>();
-        List<BaseTaskDto> recentGTaskTasks = this.gTaskRepo.getAllCompletedTasksNewerThan(gTaskedLastSavedTime);
-        ZonedDateTime taskwLastSavedTime = getLastUpdatedTime(taskwTimeEntry);
-        List<BaseTaskDto> recentTaskwTasks = this.taskwRepo.getAllCompletedTasksNewerThan(taskwLastSavedTime);
-        recentTasks.addAll(recentGTaskTasks);
-        recentTasks.addAll(recentTaskwTasks);
+        String timeEntry = String.format(entryTemplate, resourceType);
+        ZonedDateTime lastSavedTime = getLastUpdatedTime(timeEntry);
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        List<BaseTaskDto> recentTasks = resourceRepo.getAllCompletedTasksNewerThan(lastSavedTime);
         String append = this.writeToString(recentTasks);
-        Files.write(Paths.get(this.storeDirectoryPath + "/" + COMPLETED_FILENAME), append.getBytes(),
+        String completedFilename = getCompletionFilePath(resourceType);
+        Files.write(Paths.get(this.storeDirectoryPath + "/" + completedFilename), append.getBytes(),
                 StandardOpenOption.APPEND);
-        if (recentGTaskTasks.size() > 0) {
-            saveLastUpdatedTime(gTaskTimeEntry);
-        }
-        if (recentTaskwTasks.size() > 0) {
-            saveLastUpdatedTime(taskwTimeEntry);
+        if (recentTasks.size() > 0) {
+            saveLastUpdatedTime(timeEntry);
         }
     }
+
+    public ITaskResourceRepo getRepoForResourceType(TaskResourceType resourceType) {
+        switch (resourceType) {
+            case TASKWARRIOR: return this.taskwRepo;
+            case GOOGLE_TASKS: return this.gTaskRepo;
+            default: throw new RuntimeException("Unknown Resource type");
+        }
+    }
+
 
     public ZonedDateTime getLastUpdatedTime(String propertyName) throws IOException {
         //readout properties
@@ -103,13 +119,12 @@ public class TaskRepo {
     }
 
 
-    public void saveAllTasksInitial() throws IOException,
+    public void saveAllTasksInitial(TaskResourceType resourceType) throws IOException,
             CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
         ZonedDateTime startDateTime = DateTimeHelper.getOldEnoughDate();
-        List<BaseTaskDto> initialTaskList = this.gTaskRepo.getAllCompletedTasksNewerThan(startDateTime);
-        List<BaseTaskDto> initialTaskwList = this.taskwRepo.getAllCompletedTasksNewerThan(startDateTime);
-        initialTaskList.addAll(initialTaskwList);
-        this.writeToCSVFile(initialTaskList);
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        List<BaseTaskDto> initialTaskList = resourceRepo.getAllCompletedTasksNewerThan(startDateTime);
+        this.writeToCSVFile(initialTaskList, getCompletionFilePath(resourceType));
     }
 
     private String writeToString(List<BaseTaskDto> allTasks) throws
@@ -124,9 +139,9 @@ public class TaskRepo {
         return writer.toString();
     }
 
-    private void writeToCSVFile(List<BaseTaskDto> allTasks) throws IOException,
+    private void writeToCSVFile(List<BaseTaskDto> allTasks, String filePath) throws IOException,
             CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        Writer writer = new FileWriter(this.storeDirectoryPath + "/" + COMPLETED_FILENAME);
+        Writer writer = new FileWriter(filePath);
         StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
         beanToCsv.write(allTasks);
         writer.close();

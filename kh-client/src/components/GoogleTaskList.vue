@@ -25,7 +25,7 @@ export default {
   },
   created() {
     const that = this;
-    const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
+    const options = { headers: { Authorization: `Bearer ${this.$currentUser.access_token}` } };
     api.getGTaskTasksForList(this.taskList.id, options).then(
       (response) => {
         that.tasks = response.data;
