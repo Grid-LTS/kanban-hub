@@ -30,7 +30,7 @@ export default {
   created() {
     this.$getGapiClient()
       .then((gapi) => {
-        Object.defineProperty(Vue.prototype, '$auth', {
+        Object.defineProperty(Vue.prototype, '$currentUser', {
           get() { return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true); },
         });
         // Listen for sign-in state changes.

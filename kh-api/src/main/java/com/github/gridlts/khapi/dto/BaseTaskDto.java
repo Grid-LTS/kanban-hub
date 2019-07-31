@@ -1,6 +1,6 @@
 package com.github.gridlts.khapi.dto;
 
-import com.github.gridlts.khapi.types.SourceManager;
+import com.github.gridlts.khapi.resources.TaskResourceType;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -28,7 +28,7 @@ public abstract class BaseTaskDto {
     public abstract LocalDate getCompleted();
 
     @InjectCsvBindByNameAnnotation
-    public abstract SourceManager getSource();
+    public abstract TaskResourceType getSource();
 
     @InjectCsvBindByNameAnnotation
     @Nullable

@@ -2,6 +2,7 @@ package com.github.gridlts.khapi.gtasks.service;
 
 import com.github.gridlts.khapi.dto.BaseTaskDto;
 
+import com.github.gridlts.khapi.resources.ITaskResourceRepo;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
@@ -14,10 +15,10 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.github.gridlts.khapi.gtasks.service.DateTimeHelper.convertZoneDateTimeToRFC3339Timestamp;
-import static com.github.gridlts.khapi.types.SourceManager.GOOGLE_TASKS;
+import static com.github.gridlts.khapi.resources.TaskResourceType.GOOGLE_TASKS;
 
 @Service
-public class GTaskRepo {
+public class GTaskRepo implements ITaskResourceRepo {
 
     private static final Long MAX_RESULTS = 10000L;
 

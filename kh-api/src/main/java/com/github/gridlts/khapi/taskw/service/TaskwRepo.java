@@ -3,6 +3,7 @@ package com.github.gridlts.khapi.taskw.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gridlts.khapi.dto.BaseTaskDto;
 import com.github.gridlts.khapi.gtasks.service.DateTimeHelper;
+import com.github.gridlts.khapi.resources.ITaskResourceRepo;
 import com.github.gridlts.khapi.taskw.dto.TaskwDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.gridlts.khapi.types.SourceManager.TASKWARRIOR;
+import static com.github.gridlts.khapi.resources.TaskResourceType.TASKWARRIOR;
 
 @Service
-public class TaskwRepo {
+public class TaskwRepo implements ITaskResourceRepo {
 
     private static final String COMPLETED_TASKS_CMD_FORMAT = "task status:completed end.after=%s export";
     private static final String PENDING_TASKS_CMD_FORMAT = "task status:pending export";

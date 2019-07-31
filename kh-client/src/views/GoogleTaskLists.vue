@@ -31,7 +31,7 @@ export default {
     listTaskLists() {
       this.$getGapiClient()
         .then(() => {
-          const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
+          const options = { headers: { Authorization: `Bearer ${this.$currentUser.access_token}` } };
           api.getGTaskLists(options).then(
             (resp) => {
               this.taskLists = resp.data;
@@ -41,9 +41,9 @@ export default {
         });
     },
     saveAllTasksCompleted() {
-      const options = { headers: { Authorization: `Bearer ${this.$auth.access_token}` } };
+      const options = { headers: { Authorization: `Bearer ${this.$currentUser.access_token}` } };
       api.saveAllGTaskCompleted(options).then(
-        (resp) => {
+        () => {
           this.apiMessage = 'Stored all completed tasks.';
         },
       );
