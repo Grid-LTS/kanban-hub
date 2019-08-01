@@ -16,13 +16,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -44,87 +51,113 @@ public class TaskRepo {
     TaskRepo(GTaskRepo gTaskRepo, TaskwRepo taskwRepo) {
         this.gTaskRepo = gTaskRepo;
         this.taskwRepo = taskwRepo;
+        this.metadata = new Properties();
     }
 
     public void saveAllCompletedTasks(String accessToken) throws IOException, GeneralSecurityException,
-            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException  {
+            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
         // initialize sessions of resources
         this.gTaskRepo.instantiateGapiService(accessToken);
-
+        this.loadMetadataProperties();
         this.saveAllCompletedTasksForType(TaskResourceType.GOOGLE_TASKS);
         this.saveAllCompletedTasksForType(TaskResourceType.TASKWARRIOR);
+        this.saveLastUpdatedTimes();
     }
 
     public void saveAllCompletedTasksForType(TaskResourceType resourceType) throws IOException, GeneralSecurityException,
             CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-        String completedFilePath = getCompletionFilePath(resourceType);
-        File f = new File(completedFilePath);
-        if (f.isDirectory()) {
+        Path completedFilePath = Paths.get(getCompletionFilePath(resourceType));
+        if (Files.isDirectory(completedFilePath)) {
             throw new IOException(String.format("Cannot create file %s", completedFilePath));
         }
-        if (f.exists()) {
-            this.addRecentCompletedTasksForType(resourceType);
+        Path parentDirectoryPath = completedFilePath.getParent();
+        if (!Files.exists(parentDirectoryPath)) {
+            Files.createDirectory(parentDirectoryPath);
+        }
+        Path metadataFilepath = Paths.get(getMetadataFilePath());
+        if (!Files.exists(metadataFilepath)) {
+            Files.deleteIfExists(completedFilePath);
+        }
+        String entryTemplate = "last_updated_%s";
+        String timeEntry = String.format(entryTemplate, resourceType);
+        Boolean hasNewTasks;
+        if (Files.exists(metadataFilepath) && Files.exists(completedFilePath)) {
+            ZonedDateTime lastSavedTime = getLastUpdatedTime(timeEntry);
+            hasNewTasks = this.addRecentCompletedTasksForType(resourceType, lastSavedTime);
         } else {
-            this.saveAllTasksInitial(resourceType);
+            hasNewTasks = this.saveAllTasksInitial(resourceType);
+        }
+        if (hasNewTasks) {
+            long unixTime = System.currentTimeMillis();
+            this.metadata.setProperty(timeEntry, Long.toString(unixTime));
         }
     }
 
 
     public String getCompletionFilePath(TaskResourceType resourceType) {
-        return  this.storeDirectoryPath + "/" + String.format(COMPLETED_FILENAME_TEMPLATE, resourceType);
+        return this.storeDirectoryPath + "/" + String.format(COMPLETED_FILENAME_TEMPLATE, resourceType);
     }
 
-    public void addRecentCompletedTasksForType(TaskResourceType resourceType) throws IOException, CsvDataTypeMismatchException,
-            CsvRequiredFieldEmptyException, GeneralSecurityException {
-        String entryTemplate = "last_updated_%s";
-        String timeEntry = String.format(entryTemplate, resourceType);
-        ZonedDateTime lastSavedTime = getLastUpdatedTime(timeEntry);
+    public String getMetadataFilePath() {
+        return this.storeDirectoryPath + "/" + METADATA_TXT;
+    }
+
+    public boolean addRecentCompletedTasksForType(TaskResourceType resourceType, ZonedDateTime lastSavedTime) throws IOException, CsvDataTypeMismatchException,
+            CsvRequiredFieldEmptyException {
+
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> recentTasks = resourceRepo.getAllCompletedTasksNewerThan(lastSavedTime);
         String append = this.writeToString(recentTasks);
         String completedFilename = getCompletionFilePath(resourceType);
-        Files.write(Paths.get(this.storeDirectoryPath + "/" + completedFilename), append.getBytes(),
+        Files.write(Paths.get(completedFilename), append.getBytes(),
                 StandardOpenOption.APPEND);
-        if (recentTasks.size() > 0) {
-            saveLastUpdatedTime(timeEntry);
-        }
+        return recentTasks.size() > 0;
     }
 
     public ITaskResourceRepo getRepoForResourceType(TaskResourceType resourceType) {
         switch (resourceType) {
-            case TASKWARRIOR: return this.taskwRepo;
-            case GOOGLE_TASKS: return this.gTaskRepo;
-            default: throw new RuntimeException("Unknown Resource type");
+            case TASKWARRIOR:
+                return this.taskwRepo;
+            case GOOGLE_TASKS:
+                return this.gTaskRepo;
+            default:
+                throw new RuntimeException("Unknown Resource type");
         }
     }
 
+    public void loadMetadataProperties() throws IOException {
+        //readout properties
+        Path metadataFilepath = Paths.get(getMetadataFilePath());
+        if (Files.exists(metadataFilepath)) {
+            try (InputStream input = new FileInputStream(getMetadataFilePath())) {
+                this.metadata.load(input);
+            }
+        }
+    }
 
     public ZonedDateTime getLastUpdatedTime(String propertyName) throws IOException {
-        //readout properties
-        try (InputStream input = new FileInputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            this.metadata = new Properties();
-            this.metadata.load(input);
             String unixTimeString = this.metadata.getProperty(propertyName);
             long unixTime = Long.parseLong(unixTimeString, 10);
             return DateTimeHelper.convertUnixTimestampToZonedDateTime(unixTime);
-        }
     }
 
-    public void saveLastUpdatedTime(String propertyName) throws IOException {
-        try (OutputStream output = new FileOutputStream(this.storeDirectoryPath + "/" + METADATA_TXT)) {
-            long unixTime = System.currentTimeMillis();
-            this.metadata.setProperty(propertyName, Long.toString(unixTime));
+    public void saveLastUpdatedTimes() throws IOException {
+        Path metadataFilepath = Paths.get(getMetadataFilePath());
+        if (!Files.exists(metadataFilepath)) {
+            Files.createFile(metadataFilepath);
+        }
+        try (OutputStream output = new FileOutputStream(getMetadataFilePath())) {
             this.metadata.store(output, null);
         }
     }
 
-
-    public void saveAllTasksInitial(TaskResourceType resourceType) throws IOException,
+    public Boolean saveAllTasksInitial(TaskResourceType resourceType) throws IOException,
             CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
         ZonedDateTime startDateTime = DateTimeHelper.getOldEnoughDate();
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> initialTaskList = resourceRepo.getAllCompletedTasksNewerThan(startDateTime);
         this.writeToCSVFile(initialTaskList, getCompletionFilePath(resourceType));
+        return initialTaskList.size() > 0;
     }
 
     private String writeToString(List<BaseTaskDto> allTasks) throws
