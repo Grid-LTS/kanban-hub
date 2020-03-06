@@ -1,3 +1,8 @@
 include ':kh-api'
 project(':kh-api').projectDir = new File('kh-api')
 project(':kh-api').name='kh-api'
+include ':kh-base'
+project(':kh-base').projectDir = new File('kh-base')
+project(':kh-base').name='kh-base'
+include ':console'
+

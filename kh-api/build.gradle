@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.1.5.RELEASE'
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'java'
 }
 
@@ -8,13 +8,12 @@ apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 
 bootJar {
-    baseName = 'kanban-hub-api'
     version =  '0.1.0'
     mainClassName = 'com.github.gridlts.khapi.KhapiApplication'
 }
 
 bootRun {
-    systemProperty "spring.config.additional-location", "file:./config/"
+    systemProperty "spring.config.additional-location", "file:./build/libs/config/"
 }
 
 group 'com.github.gridlts'
@@ -25,24 +24,19 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat
-    implementation supportDependencies.googleApiClient
-    implementation supportDependencies.googleOauthClientJetty
-    implementation supportDependencies.googleTasksService
-    implementation supportDependencies.openCSV
-    annotationProcessor supportDependencies.orgImmutables
-    compileOnly supportDependencies.orgImmutablesBuilder
-    compileOnly supportDependencies.orgImmutablesGson
-    compileOnly supportDependencies.orgImmutablesAnnotations
-    compileOnly supportDependencies.orgImmutablesAnnotate
+    implementation (project(':kh-base')) {
+        transitive = true
+    }
 }
 
-sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+sourceSets.main.java.srcDirs = ['src/main/java']
 
 task copyConfig(type: Copy) {
-    from("$projectDir") {
+    from("$rootDir/kh-base") {
         include "config/**/*.yml"
     }
     into "${project.buildDir}/libs"
+    rename 'application.yml', 'application-default.yml'
 }
 
 tasks.jar.finalizedBy(copyConfig)

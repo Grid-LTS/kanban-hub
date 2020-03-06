@@ -1,12 +1,18 @@
 ext {
-    springBootVersion = '2.1.5.RELEASE'
+    springBootVersion = '2.2.5.RELEASE'
     gapiVersion = '1.25.0'
     googleTasksServiceVersion = 'v1-rev58-1.25.0'
     springSecurityOauthVersion = "2.3.6.RELEASE"
     orgImmutablesVersion = "2.7.4"
     openCSVVersion = "4.6"
+    springVersion = "5.2.4.RELEASE"
+    jacksonVersion = "2.10.3"
 
 supportDependencies = [
+        jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+        jackson : "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+        springContext : "org.springframework:spring-context:${springVersion}",
+        springBoot: "org.springframework.boot:spring-boot:${springBootVersion}",
         springBootStarterJersey : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
         springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
         springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
