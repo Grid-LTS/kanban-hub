@@ -13,7 +13,8 @@ module.exports = {
     proxyTable: {
       '/api': {
         target: 'http://localhost:8080',
-        changeOrigin: true
+        changeOrigin: true,
+        logLevel: "debug"
       },
     },
     // Various Dev Server settings

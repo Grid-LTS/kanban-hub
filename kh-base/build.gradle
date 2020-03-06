@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'java-library'
+}
+
+apply from: rootProject.file('gradle-plugins/dependencies.gradle')
+
+group 'com.github.gridlts'
+
+sourceCompatibility = 1.11
+
+dependencies {
+    implementation supportDependencies.jacksonDataBind
+    implementation supportDependencies.jackson
+    implementation supportDependencies.springBoot
+    implementation supportDependencies.springContext
+    implementation supportDependencies.googleApiClient
+    implementation supportDependencies.googleOauthClientJetty
+    api supportDependencies.googleTasksService
+    api supportDependencies.openCSV
+    annotationProcessor supportDependencies.orgImmutables
+    compileOnly supportDependencies.orgImmutablesBuilder
+    compileOnly supportDependencies.orgImmutablesGson
+    compileOnly supportDependencies.orgImmutablesAnnotations
+    compileOnly supportDependencies.orgImmutablesAnnotate
+    testImplementation(supportDependencies.springBootStarterTest) {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
