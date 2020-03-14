@@ -30,7 +30,7 @@ public class GTaskController {
     @RequestMapping(value = "/properties", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> getProperties() {
-        Map<String, String> gTasksConfig = new HashMap<String, String>();
+        Map<String, String> gTasksConfig = new HashMap<>();
         gTasksConfig.put("apiKey", gTasksProperties.getApiKey());
         gTasksConfig.put("scope", gTasksProperties.getScope());
         gTasksConfig.put("clientId", gTasksProperties.getClientId());

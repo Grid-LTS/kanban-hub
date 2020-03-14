@@ -1,9 +1,10 @@
 plugins {
-
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'java'
     id 'java-library'
 }
 
+apply plugin: 'io.spring.dependency-management'
 apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 group 'com.github.gridlts'

@@ -6,12 +6,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
-
-@ComponentScan(basePackages = {"com.github.gridlts.khapi.controller",
+@SpringBootApplication(scanBasePackages={"com.github.gridlts.khapi.controller",
         "com.github.gridlts.khapi.config",
         "com.github.gridlts.khapi.service",
         "com.github.gridlts.khapi.gtasks", "com.github.gridlts.khapi.taskw"})
-@SpringBootApplication
 public class KhapiApplication {
 
     public static void main(String[] args) {

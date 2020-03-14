@@ -5,6 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
     <changeSet author="Gerd Friemel" id="kh-1.0">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="tasks"/></not>
+        </preConditions>
         <createTable tableName="tasks">
             <column name="task_id" type="char(36)">
                 <constraints primaryKey="true"/>

@@ -1,16 +1,38 @@
 plugins {
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'groovy'
 }
 
+apply plugin: 'io.spring.dependency-management'
+apply from: rootProject.file('gradle-plugins/dependencies.gradle')
+
+group = 'com.github.gridlts'
 version '0.1.0'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+}
+
+bootRun{
+    systemProperty "spring.config.additional-location", "file:./build/libs/config/"
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:3.0.1'
-    implementation (project(':kh-base')) {
-        transitive = true
-    }
+    implementation supportDependencies.springBootAutoConfigure
+    implementation supportDependencies.googleHttpClient
+    implementation supportDependencies.googleOauthClientJetty
+    implementation (project(':kh-base'))
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+task copyConfig(type: Copy) {
+    from("$rootDir/kh-base") {
+        include "config/**/*.yml"
+        include "config/**/*.properties"
+    }
+    into "${project.buildDir}/libs"
+}
+
+tasks.build.finalizedBy(copyConfig)

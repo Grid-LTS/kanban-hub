@@ -10,6 +10,7 @@ public class GTasksProperties {
     private String clientId;
     private String apiKey;
     private String scope;
+    private String clientKey;
 
     public String getClientId() {
         return clientId;
@@ -33,5 +34,13 @@ public class GTasksProperties {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getClientKey() {
+        return clientKey;
+    }
+
+    public void setClientKey(String clientKey) {
+        this.clientKey = clientKey;
     }
 }
