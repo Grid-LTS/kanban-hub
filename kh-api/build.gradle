@@ -8,7 +8,6 @@ apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 
 bootJar {
-    version =  '0.1.0'
     mainClassName = 'com.github.gridlts.khapi.KhapiApplication'
 }
 
@@ -21,12 +20,10 @@ group 'com.github.gridlts'
 sourceCompatibility = 1.11
 
 dependencies {
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat
-    implementation (project(':kh-base')) {
-        transitive = true
-    }
+    implementation (project(':kh-base'))
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 sourceSets.main.java.srcDirs = ['src/main/java']

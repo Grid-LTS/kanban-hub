@@ -14,8 +14,8 @@ import java.security.GeneralSecurityException;
 @Service
 public class GTasksApiService {
 
-    private static final String APPLICATION_NAME = "Kaban Hub Client";
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    public static final String APPLICATION_NAME = "Kaban Hub Client";
+    public static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static String accessToken = "";
     private static Tasks tasksService;
 

@@ -7,7 +7,7 @@ ext {
     orgImmutablesVersion = "2.7.4"
     openCSVVersion = "4.6"
     springVersion = "5.2.4.RELEASE"
-    hsqldbVersion = "2.4"
+    hsqldbVersion = "2.5.0"
     jacksonVersion = "2.10.3"
     lombokVersion = "1.18.10"
     liquibaseVersion = "3.4.1"
@@ -17,6 +17,8 @@ supportDependencies = [
         jackson : "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
         springContext : "org.springframework:spring-context:${springVersion}",
         springBoot: "org.springframework.boot:spring-boot:${springBootVersion}",
+        springBootParent : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
+        springBootAutoConfigure : "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}",
         springBootStarterJersey : "org.springframework.boot:spring-boot-starter-jersey:${springBootVersion}",
         springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
         springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
