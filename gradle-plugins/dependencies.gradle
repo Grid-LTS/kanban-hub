@@ -1,12 +1,16 @@
 ext {
     springBootVersion = '2.2.5.RELEASE'
-    gapiVersion = '1.25.0'
+    gapiVersion = '1.30.6'
     googleTasksServiceVersion = 'v1-rev58-1.25.0'
+    googleHttpClientVersion = '1.34.2'
     springSecurityOauthVersion = "2.3.6.RELEASE"
     orgImmutablesVersion = "2.7.4"
     openCSVVersion = "4.6"
     springVersion = "5.2.4.RELEASE"
+    hsqldbVersion = "2.4"
     jacksonVersion = "2.10.3"
+    lombokVersion = "1.18.10"
+    liquibaseVersion = "3.4.1"
 
 supportDependencies = [
         jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
@@ -17,16 +21,21 @@ supportDependencies = [
         springBootStarterTest           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
         springBootStarterTomcat         : "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}",
         springBootStarterWeb            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+        springBootStarterJpa            : "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
         springBootStarterSecurity       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
+        googleHttpClient                : "com.google.http-client:google-http-client-jackson2:${googleHttpClientVersion}",
         googleApiClient                 : "com.google.api-client:google-api-client:${gapiVersion}",
         googleOauthClientJetty          : "com.google.oauth-client:google-oauth-client-jetty:${gapiVersion}",
         googleTasksService              : "com.google.apis:google-api-services-tasks:${googleTasksServiceVersion}",
+        hsqlDb                          : "org.hsqldb:hsqldb:${hsqldbVersion}",
+        liquibase                       : "org.liquibase:liquibase-core:${liquibaseVersion}",
         orgImmutables                   : "org.immutables:value:${orgImmutablesVersion}",
         orgImmutablesAnnotations        : "org.immutables:value:${orgImmutablesVersion}:annotations",
-        orgImmutablesBuilder            :  "org.immutables:builder:${orgImmutablesVersion}",
-        orgImmutablesGson               :  "org.immutables:gson:${orgImmutablesVersion}",
+        orgImmutablesBuilder            : "org.immutables:builder:${orgImmutablesVersion}",
+        orgImmutablesGson               : "org.immutables:gson:${orgImmutablesVersion}",
         orgImmutablesAnnotate           : "org.immutables:annotate:${orgImmutablesVersion}",
-        openCSV                         :  "com.opencsv:opencsv:${openCSVVersion}"
+        openCSV                         : "com.opencsv:opencsv:${openCSVVersion}",
+        projectLombok                    : "org.projectlombok:lombok:${lombokVersion}"
 ]
 }

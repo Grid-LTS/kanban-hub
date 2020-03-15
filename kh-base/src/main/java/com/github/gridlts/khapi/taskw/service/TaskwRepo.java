@@ -1,10 +1,13 @@
 package com.github.gridlts.khapi.taskw.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.gridlts.khapi.config.AppConfig;
 import com.github.gridlts.khapi.dto.BaseTaskDto;
 import com.github.gridlts.khapi.gtasks.service.DateTimeHelper;
+import com.github.gridlts.khapi.gtasks.service.GTaskRepo;
 import com.github.gridlts.khapi.resources.ITaskResourceRepo;
 import com.github.gridlts.khapi.taskw.dto.TaskwDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import static com.github.gridlts.khapi.resources.TaskResourceType.TASKWARRIOR;
 
@@ -22,8 +26,11 @@ public class TaskwRepo implements ITaskResourceRepo {
     private static final String COMPLETED_TASKS_CMD_FORMAT = "task status:completed end.after=%s export";
     private static final String PENDING_TASKS_CMD_FORMAT = "task status:pending export";
 
-    @Value("${store.path}")
     private String storeDirectoryPath;
+
+    TaskwRepo(AppConfig appConfig) {
+        this.storeDirectoryPath = appConfig.getStoreDirectoryPath();
+    }
 
     // https://taskwarrior.org/docs/commands/export.html
 
