@@ -1,0 +1,19 @@
+
+application:
+  fs:
+    path: "${HOME}/.kanban-hub"
+
+# DataSource
+spring:
+  config:
+    additional-location: "file:./config"
+  datasource:
+    url: "jdbc:hsqldb:file:${application.fs.path}/var/kanban_hub"
+    username: sa
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: "classpath:dbchangelog.xml"
+

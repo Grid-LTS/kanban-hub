@@ -1,4 +1,5 @@
 plugins {
+
     id 'java'
     id 'java-library'
 }
@@ -12,7 +13,10 @@ sourceCompatibility = 1.11
 dependencies {
     implementation supportDependencies.jacksonDataBind
     implementation supportDependencies.jackson
+    runtimeOnly supportDependencies.hsqlDb
+    implementation supportDependencies.liquibase
     implementation supportDependencies.springBoot
+    implementation supportDependencies.springBootStarterJpa
     implementation supportDependencies.springContext
     implementation supportDependencies.googleApiClient
     implementation supportDependencies.googleOauthClientJetty
@@ -23,6 +27,10 @@ dependencies {
     compileOnly supportDependencies.orgImmutablesGson
     compileOnly supportDependencies.orgImmutablesAnnotations
     compileOnly supportDependencies.orgImmutablesAnnotate
+    compileOnly supportDependencies.projectLombok
+    testCompileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
+    testAnnotationProcessor supportDependencies.projectLombok
     testImplementation(supportDependencies.springBootStarterTest) {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

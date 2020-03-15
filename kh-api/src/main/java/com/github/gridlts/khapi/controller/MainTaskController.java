@@ -1,6 +1,6 @@
 package com.github.gridlts.khapi.controller;
 
-import com.github.gridlts.khapi.service.TaskRepo;
+import com.github.gridlts.khapi.service.TaskDbRepo;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +16,10 @@ import java.security.GeneralSecurityException;
 @Controller
 public class MainTaskController {
 
-    private TaskRepo taskRepo;
+    private TaskDbRepo taskRepo;
 
     @Autowired
-    MainTaskController(TaskRepo taskRepo) {
+    MainTaskController(TaskDbRepo taskRepo) {
         this.taskRepo = taskRepo;
     }
 

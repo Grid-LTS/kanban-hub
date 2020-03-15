@@ -34,6 +34,7 @@ sourceSets.main.java.srcDirs = ['src/main/java']
 task copyConfig(type: Copy) {
     from("$rootDir/kh-base") {
         include "config/**/*.yml"
+        include "config/**/*.properties"
     }
     into "${project.buildDir}/libs"
     rename 'application.yml', 'application-default.yml'
