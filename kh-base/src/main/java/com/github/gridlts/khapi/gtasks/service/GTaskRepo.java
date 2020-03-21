@@ -98,7 +98,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                     continue;
                 }
                 BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
-                        .taskId(UUID.randomUUID())
+                        .taskId(task.getId())
                         .title(task.getTitle())
                         .description(task.getNotes())
                         .completed(DateTimeHelper.convertGoogleTimeToDate(task.getCompleted()))
