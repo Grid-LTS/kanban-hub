@@ -37,7 +37,6 @@ task copyConfig(type: Copy) {
         include "config/**/*.properties"
     }
     into "${project.buildDir}/libs"
-    rename 'application.yml', 'application-default.yml'
 }
 
 tasks.jar.finalizedBy(copyConfig)
