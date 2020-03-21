@@ -1,6 +1,5 @@
 package com.github.gridlts.khapi.model;
 
-import com.github.gridlts.khapi.resources.TaskResourceType;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,16 +15,19 @@ public class TaskEntity {
     @Column(name = "task_id", nullable=false, columnDefinition = "char(36)")
     private String taskId;
 
+    @Column(name = "resource_id", nullable=false, columnDefinition = "varchar(50)")
+    private String resourceId;
+
     @Column(name="title", nullable = false, columnDefinition = "varchar(255)")
     private String title;
 
     private String description;
 
-    @Column(name="completion_date", nullable=false, columnDefinition = "datetime")
+    @Column(name="completion_date", nullable=false, columnDefinition = "date")
     private LocalDate completionDate;
 
     @Column(nullable=false, columnDefinition = "varchar(32)")
-    private TaskResourceType resource;
+    private String resource;
 
     @Column(name="project_code", columnDefinition = "varchar(50)")
     private String projectCode;

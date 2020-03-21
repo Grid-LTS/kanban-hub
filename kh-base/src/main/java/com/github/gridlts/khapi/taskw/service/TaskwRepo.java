@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gridlts.khapi.config.AppConfig;
 import com.github.gridlts.khapi.dto.BaseTaskDto;
 import com.github.gridlts.khapi.gtasks.service.DateTimeHelper;
-import com.github.gridlts.khapi.gtasks.service.GTaskRepo;
 import com.github.gridlts.khapi.resources.ITaskResourceRepo;
 import com.github.gridlts.khapi.taskw.dto.TaskwDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -16,7 +13,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import static com.github.gridlts.khapi.resources.TaskResourceType.TASKWARRIOR;
 
@@ -70,7 +66,7 @@ public class TaskwRepo implements ITaskResourceRepo {
                 continue;
             }
             BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
-                    .taskId(taskwTask.uuid())
+                    .taskId(taskwTask.uuid().toString())
                     .title(taskwTask.description())
                     .completed(taskwTask.end().toLocalDate())
                     .source(TASKWARRIOR)
