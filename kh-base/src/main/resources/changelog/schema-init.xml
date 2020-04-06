@@ -12,6 +12,9 @@
             <column name="resource_id" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="insert_ts" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>

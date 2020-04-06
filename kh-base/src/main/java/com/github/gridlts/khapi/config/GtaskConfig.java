@@ -14,6 +14,4 @@ public class GtaskConfig {
     private String clientId;
     private String clientKey;
     private String Scope;
-
-
 }

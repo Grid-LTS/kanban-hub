@@ -1,8 +1,10 @@
 package com.github.gridlts.khapi.model;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,6 +19,10 @@ public class TaskEntity {
 
     @Column(name = "resource_id", nullable=false, columnDefinition = "varchar(50)")
     private String resourceId;
+
+    @Column(name="insert_ts", nullable=false, columnDefinition = "datetime(0")
+    @CreationTimestamp
+    private Instant insertTime;
 
     @Column(name="title", nullable = false, columnDefinition = "varchar(255)")
     private String title;
