@@ -9,7 +9,7 @@ spring:
     additional-location: "file:./config"
   datasource:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
-    url: "jdbc:hsqldb:file:${application.fs.path}/var/kanban_hub"
+    url: "jdbc:hsqldb:file:${application.fs.path}/db/kanban_hub"
     password:
     username: sa
   jpa:

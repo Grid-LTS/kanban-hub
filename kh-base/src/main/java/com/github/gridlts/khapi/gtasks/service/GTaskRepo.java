@@ -24,7 +24,7 @@ public class GTaskRepo implements ITaskResourceRepo {
 
     private Tasks tasksService;
 
-    GTaskRepo(GTasksApiService gTasksApiService) {
+    GTaskRepo() {
     }
 
     public List<TaskList> getTaskListsEntry(String accessToken) throws IOException, GeneralSecurityException {
