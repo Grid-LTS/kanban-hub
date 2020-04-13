@@ -6,6 +6,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,9 +21,11 @@ public class GTasksApiService {
     private static Tasks tasksService;
 
     public static Tasks instantiateGapiService(String accessToken) throws IOException, GeneralSecurityException {
+        // sanitize accessToken
+        String accessTokenString = StringUtils.removeStart(accessToken, "Bearer ");
         if (GTasksApiService.tasksService == null ||
-                !GTasksApiService.accessToken.equals(accessToken.substring(7))) {
-            GTasksApiService.accessToken = accessToken.substring(7);
+                !GTasksApiService.accessToken.equals(accessTokenString)) {
+            GTasksApiService.accessToken = accessTokenString;
             GoogleCredential credential = new GoogleCredential().setAccessToken(GTasksApiService.accessToken);
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             GTasksApiService.tasksService = new Tasks.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)

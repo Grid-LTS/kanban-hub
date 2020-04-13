@@ -1,4 +1,5 @@
 ext {
+    apacheCommonsVersion = "3.10"
     springBootVersion = '2.2.5.RELEASE'
     gapiVersion = '1.30.6'
     googleTasksServiceVersion = 'v1-rev58-1.25.0'
@@ -12,7 +13,9 @@ ext {
     lombokVersion = "1.18.10"
     liquibaseVersion = "3.4.1"
 
+
 supportDependencies = [
+        apacheCommons : "org.apache.commons:commons-lang3:${apacheCommonsVersion}",
         jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
         jackson : "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
         springContext : "org.springframework:spring-context:${springVersion}",
