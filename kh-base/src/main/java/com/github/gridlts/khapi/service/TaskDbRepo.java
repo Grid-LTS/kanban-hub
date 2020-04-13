@@ -107,6 +107,9 @@ public class TaskDbRepo {
     public void persistTasks(List<BaseTaskDto> tasks) {
         List<TaskEntity> taskEntities = tasks.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
         taskRepository.saveAll(taskEntities);
+        for (BaseTaskDto task : tasks) {
+            log.info("Saved task {}, tagged {}", task.getTitle(), task.getTags());
+        }
     }
 
     private TaskEntity convertTaskToNewModel(BaseTaskDto task) {
