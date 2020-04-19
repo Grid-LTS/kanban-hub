@@ -56,7 +56,9 @@ class GoogleAuthorization {
             // authorization
             return authorize()
         } catch (Exception e) {
-            println("Something went wrong")
+            println("Google Tasks authorization failed:")
+            println(e)
+            System.exit(0)
         }
     }
 }
