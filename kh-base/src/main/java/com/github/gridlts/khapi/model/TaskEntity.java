@@ -5,7 +5,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -30,7 +29,7 @@ public class TaskEntity {
     private String description;
 
     @Column(name="completion_date", nullable=false, columnDefinition = "date")
-    private LocalDate completionDate;
+    private Instant completionDate;
 
     @Column(nullable=false, columnDefinition = "varchar(32)")
     private String resource;
