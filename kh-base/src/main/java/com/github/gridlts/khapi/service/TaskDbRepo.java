@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.github.gridlts.khapi.resources.TaskResourceType.TASKWARRIOR;
 
 @Service
 @Slf4j
@@ -59,7 +59,7 @@ public class TaskDbRepo {
             tasksSaved = addRecentCompletedTasksForType(resourceType, lastUpdatedTime.get());
         }
         if (!tasksSaved) {
-            log.warn(String.format("No tasks could be found for resource %s.", resourceType));
+            log.info(String.format("No tasks could be found for resource %s.", resourceType));
         }
         updateTimestamp(resourceType);
     }
@@ -112,17 +112,37 @@ public class TaskDbRepo {
         }
     }
 
+    public List<BaseTaskDto> getAllTasksInsertedBefore(TaskResourceType resourceType, Instant lowerTimeLimit) {
+        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndInsertTimeAfter(
+                resourceType.toString(), lowerTimeLimit);
+        return taskEntities.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
+    }
+
     private TaskEntity convertTaskToNewModel(BaseTaskDto task) {
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTitle(task.getTitle());
         taskEntity.setTaskId(UUID.randomUUID().toString());
         taskEntity.setResourceId(task.getTaskId());
         taskEntity.setResource(task.getSource().toString());
-        taskEntity.setCompletionDate(task.getCompleted());
+        taskEntity.setCompletionDate(task.getCompleted().atTime(0,0)
+                .toInstant(ZoneOffset.UTC));
         taskEntity.setDescription(task.getDescription());
         taskEntity.setProjectCode(task.getProjectCode());
         taskEntity.setTags(task.getTags());
         return taskEntity;
+    }
+
+    private BaseTaskDto convertTaskToNewModel(TaskEntity taskEntity) {
+        return new BaseTaskDto.Builder()
+                .taskId(taskEntity.getResourceId())
+                .title(taskEntity.getTitle())
+                .completed(LocalDate.ofInstant(taskEntity.getCompletionDate(), ZoneOffset.UTC))
+                .description(taskEntity.getDescription())
+                .projectCode(taskEntity.getProjectCode())
+                .source(TaskResourceType.getResourceType(taskEntity.getResource()))
+                .addAllTags(taskEntity.getTags())
+                .projectCode(taskEntity.getProjectCode())
+                .build();
     }
 
 }
