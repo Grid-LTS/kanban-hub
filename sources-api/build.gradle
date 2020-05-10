@@ -1,0 +1,51 @@
+plugins {
+        id 'java'
+        id 'java-library'
+        id 'maven-publish'
+    }
+
+apply from: rootProject.file('gradle-plugins/dependencies.gradle')
+
+group 'com.github.gridlts.kanbanhub'
+version  '0.0.1-SNAPSHOT'
+
+
+sourceCompatibility = 1.11
+
+repositories {
+    mavenLocal()
+}
+
+dependencies {
+    implementation supportDependencies.apacheCommons
+    implementation supportDependencies.jacksonDataBind
+    implementation supportDependencies.jackson
+    implementation supportDependencies.openCSV
+    implementation supportDependencies.findBugsJsr
+    annotationProcessor supportDependencies.orgImmutables
+    compileOnly supportDependencies.orgImmutablesBuilder
+    compileOnly supportDependencies.orgImmutablesGson
+    compileOnly supportDependencies.orgImmutablesAnnotations
+    compileOnly supportDependencies.orgImmutablesAnnotate
+    compileOnly supportDependencies.projectLombok
+    testCompileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
+    testAnnotationProcessor supportDependencies.projectLombok
+    testImplementation(supportDependencies.springBootStarterTest) {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId =  'com.github.gridlts.kanbanhub'
+            artifactId = 'sources-api'
+            version = '0.0.1-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}

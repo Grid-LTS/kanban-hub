@@ -1,8 +1,11 @@
-include ':kh-api'
-project(':kh-api').projectDir = new File('kh-api')
-project(':kh-api').name='kh-api'
-include ':kh-base'
-project(':kh-base').projectDir = new File('kh-base')
-project(':kh-base').name='kh-base'
+include ':api'
+project(':api').projectDir = new File('api')
+project(':api').name='api'
+include ':sources-api'
+project(':sources-api').projectDir = new File('sources-api')
+project(':sources-api').name='sources-api'
+include ':base'
+project(':base').projectDir = new File('base')
+project(':base').name='base'
 include ':console'
 
