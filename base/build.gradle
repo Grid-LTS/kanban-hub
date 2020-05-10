@@ -1,0 +1,54 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'java-library'
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply from: rootProject.file('gradle-plugins/dependencies.gradle')
+
+group 'com.github.gridlts'
+
+sourceCompatibility = 1.11
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    implementation supportDependencies.springBootStarterJpa
+    implementation supportDependencies.apacheCommons
+    implementation supportDependencies.jacksonDataBind
+    implementation supportDependencies.jackson
+    runtimeOnly supportDependencies.hsqlDb
+    implementation supportDependencies.liquibase
+    implementation supportDependencies.findBugsJsr
+    implementation "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
+    implementation project(':sources-api')
+    api supportDependencies.openCSV
+    annotationProcessor supportDependencies.orgImmutables
+    compileOnly supportDependencies.orgImmutablesBuilder
+    compileOnly supportDependencies.orgImmutablesGson
+    compileOnly supportDependencies.orgImmutablesAnnotations
+    compileOnly supportDependencies.orgImmutablesAnnotate
+    compileOnly supportDependencies.projectLombok
+    testCompileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
+    testAnnotationProcessor supportDependencies.projectLombok
+    testImplementation(supportDependencies.springBootStarterTest) {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
+task copyConfig(type: Copy) {
+    from("$projectDir") {
+        include "config/**/*.yml"
+        include "config/**/*.properties"
+    }
+    into "${project.buildDir}/libs"
+}

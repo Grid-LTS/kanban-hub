@@ -21,14 +21,12 @@ bootRun{
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:3.0.1'
     implementation supportDependencies.springBootAutoConfigure
-    implementation supportDependencies.googleHttpClient
-    implementation supportDependencies.googleOauthClientJetty
-    implementation (project(':kh-base'))
+    implementation (project(':base'))
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 task copyConfig(type: Copy) {
-    from("$rootDir/kh-base") {
+    from("${project(':base').projectDir}") {
         include "config/**/*.yml"
         include "config/**/*.properties"
     }
