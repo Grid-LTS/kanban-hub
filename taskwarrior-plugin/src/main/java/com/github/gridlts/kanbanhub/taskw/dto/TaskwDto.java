@@ -1,10 +1,10 @@
-package com.github.gridlts.khapi.taskw.dto;
+package com.github.gridlts.kanbanhub.taskw.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.gridlts.kanbanhub.dto.CustomDateDeserializer;
+import com.github.gridlts.kanbanhub.taskw.service.CustomDateDeserializer;
 import org.immutables.value.Value;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +43,6 @@ public abstract class TaskwDto {
 
     public abstract String urgency();
 
-    public static class Builder extends com.github.gridlts.khapi.taskw.dto.ImmutableTaskwDto.Builder {
+    public static class Builder extends com.github.gridlts.kanbanhub.taskw.dto.ImmutableTaskwDto.Builder {
     }
 }

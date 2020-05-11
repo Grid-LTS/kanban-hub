@@ -1,11 +1,11 @@
-package com.github.gridlts.khapi.taskw.service;
+package com.github.gridlts.kanbanhub.taskw.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.gridlts.kanbanhub.config.AppConfig;
-import com.github.gridlts.kanbanhub.service.DateTimeHelper;
+import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
-import com.github.gridlts.khapi.taskw.dto.TaskwDto;
+import com.github.gridlts.kanbanhub.taskw.TaskWarriorConfig;
+import com.github.gridlts.kanbanhub.taskw.dto.TaskwDto;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -24,14 +24,16 @@ public class TaskwRepo implements ITaskResourceRepo {
 
     private String storeDirectoryPath;
 
-    public TaskwRepo(AppConfig appConfig) {
+    public TaskwRepo(TaskWarriorConfig appConfig) {
         this.storeDirectoryPath = appConfig.getStoreDirectoryPath();
     }
 
     // https://taskwarrior.org/docs/commands/export.html
 
+    @Override
     public void init(String token){}
 
+    @Override
     public void initConsole(){}
 
     @Override
@@ -89,7 +91,7 @@ public class TaskwRepo implements ITaskResourceRepo {
     }
 
     public void getAllCompletedTasks() throws IOException {
-        this.getCompletedTaskwTasks(DateTimeHelper.getOldEnoughDate());
+        this.getCompletedTaskwTasks(DateUtilities.getOldEnoughDate());
     }
 
 }

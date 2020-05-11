@@ -1,4 +1,4 @@
-package com.github.gridlts.kanbanhub.dto;
+package com.github.gridlts.kanbanhub.taskw.service;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import static com.github.gridlts.kanbanhub.service.DateTimeHelper.TASKW_DATE_PATTERN;
+import static com.github.gridlts.kanbanhub.taskw.service.DateTimeHelper.TASKW_DATE_PATTERN;
 
 
 public class CustomDateDeserializer extends StdDeserializer<ZonedDateTime> {
