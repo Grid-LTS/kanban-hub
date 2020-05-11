@@ -9,7 +9,7 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-group 'com.github.gridlts.kanbab-hub'
+group 'com.github.gridlts.kanbanhub'
 
 sourceCompatibility = 1.11
 
@@ -22,8 +22,6 @@ repositories {
 
 dependencies {
     implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
-    //implementation supportDependencies.jacksonDataBind
-    //implementation supportDependencies.jackson
     implementation "org.springframework.boot:spring-boot:${springBootVersion}"
     implementation "org.springframework:spring-web:${springVersion}"
     implementation "com.google.http-client:google-http-client-jackson2:${googleHttpClientVersion}"
@@ -31,10 +29,6 @@ dependencies {
     implementation "com.google.oauth-client:google-oauth-client-jetty:${gapiVersion}"
     implementation "com.github.gridlts.kanbanhub:sources-api:${khSourcesApiVersion}"
     implementation "com.google.apis:google-api-services-tasks:${googleTasksServiceVersion}"
-    //compileOnly supportDependencies.projectLombok
-    //testCompileOnly supportDependencies.projectLombok
-    //annotationProcessor supportDependencies.projectLombok
-    //testAnnotationProcessor supportDependencies.projectLombok
     //testImplementation(supportDependencies.springBootStarterTest) {
     //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     //}

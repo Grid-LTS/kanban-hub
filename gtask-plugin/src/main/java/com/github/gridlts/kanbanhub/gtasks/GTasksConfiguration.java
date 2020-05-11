@@ -1,4 +1,4 @@
-package com.github.gridlts.kanbanhub.config;
+package com.github.gridlts.kanbanhub.gtasks;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

@@ -27,6 +27,7 @@ dependencies {
     implementation supportDependencies.liquibase
     implementation supportDependencies.findBugsJsr
     implementation "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
+    implementation "com.github.gridlts.kanbanhub:taskwarrior-plugin:0.0.1-SNAPSHOT"
     implementation project(':sources-api')
     api supportDependencies.openCSV
     annotationProcessor supportDependencies.orgImmutables

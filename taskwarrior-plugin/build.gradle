@@ -1,0 +1,50 @@
+import org.gradle.api.publish.maven.MavenPublication
+
+plugins {
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group 'com.github.gridlts.kanbanhub'
+
+sourceCompatibility = 1.11
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
+    implementation "com.github.gridlts.kanbanhub:sources-api:${khSourcesApiVersion}"
+    annotationProcessor   "org.immutables:value:${orgImmutablesVersion}"
+    compileOnly  "org.immutables:builder:${orgImmutablesVersion}"
+    compileOnly "org.immutables:gson:${orgImmutablesVersion}"
+    compileOnly  "org.immutables:value:${orgImmutablesVersion}:annotations"
+    compileOnly  "org.immutables:annotate:${orgImmutablesVersion}"
+    //testImplementation(supportDependencies.springBootStarterTest) {
+    //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    //}
+}
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId =  'com.github.gridlts.kanbanhub'
+            artifactId = 'taskwarrior-plugin'
+            version = '0.0.1-SNAPSHOT'
+            from components.java
+        }
+    }
+}

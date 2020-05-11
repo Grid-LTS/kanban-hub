@@ -2,6 +2,7 @@ package com.github.gridlts.kanbanhub.service;
 
 import com.github.gridlts.kanbanhub.config.AppConfig;
 import com.github.gridlts.kanbanhub.csv.CustomHeaderColumnNameMappingStrategy;
+import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.ImmutableBaseTaskDto;
@@ -55,7 +56,7 @@ public class TaskCsvExport {
             isInitial = false;
         } else {
             isInitial = true;
-            lastUpdatedDate = DateTimeHelper.getOldEnoughDate().toInstant();
+            lastUpdatedDate = DateUtilities.getOldEnoughDate().toInstant();
         }
         List<BaseTaskDto> newTasks = taskDbRepo.getAllTasksInsertedBefore(resourceType, lastUpdatedDate);
         if (newTasks.size() == 0) {

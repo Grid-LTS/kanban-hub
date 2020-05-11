@@ -1,5 +1,6 @@
 package com.github.gridlts.kanbanhub.service;
 
+import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.model.LastUpdatedEntity;
 import com.github.gridlts.kanbanhub.model.TaskEntity;
 import com.github.gridlts.kanbanhub.repository.LastUpdatedRepository;
@@ -94,7 +95,7 @@ public class TaskDbRepo {
     }
 
     public Boolean saveAllTasksInitial(String resourceType) throws IOException {
-        ZonedDateTime startDateTime = DateTimeHelper.getOldEnoughDate();
+        ZonedDateTime startDateTime = DateUtilities.getOldEnoughDate();
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> initialTaskList = resourceRepo.getAllCompletedTasksNewerThan(startDateTime);
         persistTasks(initialTaskList);

@@ -5,11 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 
 @SpringBootApplication(scanBasePackages = [
-        "com.github.gridlts.kanbanhub.console",
-        "com.github.gridlts.kanbanhub.config",
-        "com.github.gridlts.kanbanhub.service",
-        "com.github.gridlts.kanbanhub.repository",
-        "com.github.gridlts.khapi.taskw"])
+        "com.github.gridlts.kanbanhub"])
 @EntityScan("com.github.gridlts.kanbanhub.model")
 class KanbanHubConsoleApplication {
 
