@@ -21,6 +21,7 @@ public abstract class TaskwDto {
     public abstract String description();
 
     @JsonDeserialize(using = CustomDateDeserializer.class)
+    @Nullable
     public abstract ZonedDateTime end();
 
     @JsonDeserialize(using = CustomDateDeserializer.class)
