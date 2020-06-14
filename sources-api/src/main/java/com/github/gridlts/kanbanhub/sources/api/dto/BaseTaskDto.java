@@ -22,6 +22,9 @@ public abstract class BaseTaskDto {
     public abstract String getDescription();
 
     @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
+    public abstract LocalDate getCreationDate();
+
+    @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
     public abstract LocalDate getCompleted();
 
     @InjectCsvBindByNameAnnotation

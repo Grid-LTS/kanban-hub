@@ -15,6 +15,8 @@ public interface TaskRepository extends JpaRepository<TaskEntity, String> {
     @Query("SELECT max(task.completionDate) FROM TaskEntity task")
     LocalDate getMaxCompletionDate();
 
+    List<TaskEntity> findAllByResource(String resourceType);
+
     List<TaskEntity> findAllByResourceAndInsertTimeAfter(String resourceType,
                                                          Instant lowerDateLimit);
 }

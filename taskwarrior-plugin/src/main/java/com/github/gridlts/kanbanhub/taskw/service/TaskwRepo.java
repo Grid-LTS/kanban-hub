@@ -80,6 +80,7 @@ public class TaskwRepo implements ITaskResourceRepo {
             BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
                     .taskId(taskwTask.uuid().toString())
                     .title(taskwTask.description())
+                    .creationDate(taskwTask.entry().toLocalDate())
                     .completed(taskwTask.end().toLocalDate())
                     .source(TASKWARRIOR)
                     .addAllTags(taskwTask.tags())
