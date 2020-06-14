@@ -22,12 +22,13 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
-            <column name="creation_date" type="date">
-                <constraints nullable="false" />
-            </column>
-            <column name="completion_date" type="date" >
+            <column name="status" type="varchar(16)">
                 <constraints nullable="false"/>
             </column>
+            <column name="creation_date" type="varchar(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="completion_date" type="date"/>
             <column name="resource" type="varchar(32)" >
                 <constraints nullable="false"/>
             </column>

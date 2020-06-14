@@ -13,4 +13,15 @@
         </column>
     </addColumn>
 </changeSet>
+<changeSet author="Gerd Friemel" id="add_column_status">
+    <preConditions onFail="MARK_RAN">
+        <not><columnExists tableName="tasks" columnName="status"/></not>
+    </preConditions>
+    <addColumn tableName="tasks" >
+        <column name="status" type="varchar(16)" afterColumn="description" defaultValue="PENDING">
+            <constraints nullable="false"/>
+        </column>
+    </addColumn>
+    <dropNotNullConstraint columnDataType="date" columnName="completion_date" tableName="tasks"/>
+</changeSet>
 </databaseChangeLog>

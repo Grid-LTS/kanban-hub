@@ -3,24 +3,28 @@ package com.github.gridlts.kanbanhub.taskw.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.taskw.TaskWarriorConfig;
 import com.github.gridlts.kanbanhub.taskw.dto.TaskwDto;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.github.gridlts.kanbanhub.sources.api.TaskResourceType.TASKWARRIOR;
+import static com.github.gridlts.kanbanhub.sources.api.TaskStatus.COMPLETED;
+import static com.github.gridlts.kanbanhub.sources.api.TaskStatus.PENDING;
 
 @Service
 public class TaskwRepo implements ITaskResourceRepo {
 
     private static final String COMPLETED_TASKS_CMD_FORMAT = "task status:completed end.after=%s export";
-    private static final String PENDING_TASKS_CMD_FORMAT = "task status:pending export";
+    private static final String TASKS_CMD_FORMAT = "task modified.after=%s export";
 
     private String storeDirectoryPath;
 
@@ -31,19 +35,22 @@ public class TaskwRepo implements ITaskResourceRepo {
     // https://taskwarrior.org/docs/commands/export.html
 
     @Override
-    public void init(String token){}
+    public void init(String token) {
+    }
 
     @Override
-    public void initConsole(){}
+    public void initConsole() {
+    }
 
     @Override
     public String getResourceType() {
         return "taskwarrior";
     }
 
-    public List<TaskwDto> getCompletedTaskwTasks(ZonedDateTime newerThanDateTime) throws IOException {
+
+    List<TaskwDto> getTasks(String command, ZonedDateTime newerThanDateTime) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                String.format(COMPLETED_TASKS_CMD_FORMAT, DateTimeHelper.convertZoneDateTimeToTaskwDate(newerThanDateTime))
+                String.format(command, DateTimeHelper.convertZoneDateTimeToTaskwDate(newerThanDateTime))
                         .split(" "));
         builder.redirectErrorStream(true);
         builder.directory(new File(this.storeDirectoryPath));
@@ -66,9 +73,34 @@ public class TaskwRepo implements ITaskResourceRepo {
     }
 
     @Override
-    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime) throws IOException {
-        List<TaskwDto> taskwTasks = getCompletedTaskwTasks(completedAfterDateTime);
+    public List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime newerThanDateTime) {
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
+        List<TaskwDto> taskwTasks;
+        try {
+            taskwTasks = getTasks(TASKS_CMD_FORMAT, newerThanDateTime);
+        } catch (IOException ex) {
+            return convertedTaskList;
+        }
+        for (TaskwDto taskwTask : taskwTasks) {
+            if (taskwTask.status().equals("deleted")) {
+                continue;
+            }
+            BaseTaskDto baseTaskDto = mapToDto(taskwTask);
+            convertedTaskList.add(baseTaskDto);
+        }
+        return convertedTaskList;
+    }
+
+    @Override
+    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime) {
+        List<BaseTaskDto> convertedTaskList = new ArrayList<>();
+        List<TaskwDto> taskwTasks;
+        try {
+            taskwTasks = getTasks(COMPLETED_TASKS_CMD_FORMAT, completedAfterDateTime);
+        } catch (IOException ex) {
+            return convertedTaskList;
+        }
+
         for (TaskwDto taskwTask : taskwTasks) {
             // consistency checks before conversion for saving to file
             if (taskwTask.end() == null) {
@@ -77,22 +109,37 @@ public class TaskwRepo implements ITaskResourceRepo {
             if (taskwTask.end().isBefore(completedAfterDateTime)) {
                 continue;
             }
-            BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
-                    .taskId(taskwTask.uuid().toString())
-                    .title(taskwTask.description())
-                    .creationDate(taskwTask.entry().toLocalDate())
-                    .completed(taskwTask.end().toLocalDate())
-                    .source(TASKWARRIOR)
-                    .addAllTags(taskwTask.tags())
-                    .projectCode(taskwTask.project())
-                    .build();
+            BaseTaskDto baseTaskDto = mapToDto(taskwTask);
             convertedTaskList.add(baseTaskDto);
         }
         return convertedTaskList;
     }
 
-    public void getAllCompletedTasks() throws IOException {
-        this.getCompletedTaskwTasks(DateUtilities.getOldEnoughDate());
+    private BaseTaskDto mapToDto(TaskwDto taskwTask) {
+        TaskStatus status;
+        switch (taskwTask.status()) {
+            case "pending":
+                status = PENDING;
+                break;
+            case "completed":
+                status = COMPLETED;
+                break;
+            case "deleted":
+                throw new IllegalStateException("Status deleted not allowed");
+            default:
+                status = PENDING;
+        }
+        LocalDate completedDate = taskwTask.end() != null ? taskwTask.end().toLocalDate() : null;
+        return new BaseTaskDto.Builder()
+                .taskId(taskwTask.uuid().toString())
+                .title(taskwTask.description())
+                .status(status)
+                .creationDate(taskwTask.entry().toLocalDate())
+                .completed(completedDate)
+                .source(TASKWARRIOR)
+                .addAllTags(taskwTask.tags())
+                .projectCode(taskwTask.project())
+                .build();
     }
 
 }

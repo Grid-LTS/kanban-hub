@@ -2,6 +2,7 @@ package com.github.gridlts.kanbanhub.gtasks;
 
 import com.github.gridlts.kanbanhub.gtasks.service.GTasksApiService;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +63,16 @@ public class GTaskRepo implements ITaskResourceRepo {
         return this.getTaskLists();
     }
 
-    public List<TaskList> getTaskLists() throws IOException {
-        TaskLists result = this.tasksService.tasklists().list()
-                .setMaxResults(10L)
-                .execute();
-        List<TaskList> taskLists = result.getItems();
+    public List<TaskList> getTaskLists() {
+        List<TaskList> taskLists = new ArrayList<>();
+        try {
+            TaskLists result = this.tasksService.tasklists().list()
+                    .setMaxResults(10L)
+                    .execute();
+            taskLists = result.getItems();
+        } catch(IOException ex) {
+            return taskLists;
+        }
         if (taskLists == null) {
             taskLists = new ArrayList<>();
         }
@@ -92,23 +99,45 @@ public class GTaskRepo implements ITaskResourceRepo {
     }
 
 
-    public List<Task> getCompletedTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime)
-            throws IOException {
-        com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
-                .setMaxResults(MAX_RESULTS)
-                .setCompletedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
-                .setShowCompleted(true)
-                .setShowHidden(true)
-                .execute();
-        List<Task> tasksForTaskList = result.getItems();
+    public List<Task> getCompletedTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime) {
+        List<Task> tasksForTaskList = new ArrayList<>();
+        try {
+            com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
+                    .setMaxResults(MAX_RESULTS)
+                    .setCompletedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
+                    .setShowCompleted(true)
+                    .setShowHidden(true)
+                    .execute();
+            tasksForTaskList = result.getItems();
+        } catch (IOException exception) {
+            return tasksForTaskList;
+        }
         if (tasksForTaskList == null) {
             tasksForTaskList = new ArrayList<>();
         }
         return tasksForTaskList;
     }
 
-    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime)
-            throws IOException {
+    public List<Task> getTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime){
+        List<Task> tasksForTaskList = new ArrayList<>();
+        try {
+            com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
+                    .setMaxResults(MAX_RESULTS)
+                    .setUpdatedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
+                    .setShowCompleted(true)
+                    .setShowHidden(true)
+                    .execute();
+            tasksForTaskList = result.getItems();
+        } catch (IOException exception) {
+            return tasksForTaskList;
+        }
+        if (tasksForTaskList == null) {
+            tasksForTaskList = new ArrayList<>();
+        }
+        return tasksForTaskList;
+    }
+
+    public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime) {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskList taskList : taskLists) {
@@ -122,26 +151,59 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
-                DateTime dateUpdated;
-                if (task.getCompleted() != null &&
-                        task.getUpdated().getValue() > task.getCompleted().getValue()) {
-                    // Todo use saved information of ongoing tasks
-                    dateUpdated = task.getCompleted();
-                } else {
-                    dateUpdated = task.getUpdated();
-                }
-                BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
-                        .taskId(task.getId())
-                        .title(task.getTitle())
-                        .description(task.getNotes())
-                        .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
-                        .completed(DateTimeHelper.convertGoogleTimeToDate(task.getCompleted()))
-                        .source(GOOGLE_TASKS)
-                        .addTags(taskList.getTitle())
-                        .build();
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
                 convertedTaskList.add(baseTaskDto);
             }
         }
         return convertedTaskList;
+    }
+
+    @Override
+    public List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime newerThanDateTime){
+        List<TaskList> taskLists = this.getTaskLists();
+        List<BaseTaskDto> convertedTaskList = new ArrayList<>();
+        for (TaskList taskList : taskLists) {
+            List<Task> tasks = this.getTasksForTaskList(taskList.getId(), newerThanDateTime);
+            for (Task task : tasks) {
+                // consistency checks before conversion for saving to file
+                ZonedDateTime taskDateTime = DateTimeHelper.convertGoogleTimeToZonedDateTime(task.getUpdated());
+                if (taskDateTime.isBefore(newerThanDateTime)) {
+                    continue;
+                }
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
+                convertedTaskList.add(baseTaskDto);
+            }
+        }
+        return convertedTaskList;
+    }
+
+
+    private BaseTaskDto mapTaskToDto(Task task, TaskList taskList) {
+        DateTime dateUpdated;
+        if (task.getCompleted() != null &&
+                task.getUpdated().getValue() > task.getCompleted().getValue()) {
+            dateUpdated = task.getCompleted();
+        } else {
+            dateUpdated = task.getUpdated();
+        }
+        LocalDate completedDate;
+        TaskStatus status;
+        if (task.getCompleted() == null) {
+            completedDate = null;
+            status = TaskStatus.PENDING;
+        } else {
+            completedDate = DateTimeHelper.convertGoogleTimeToDate(task.getCompleted());
+            status = TaskStatus.COMPLETED;
+        }
+        return new BaseTaskDto.Builder()
+                .taskId(task.getId())
+                .title(task.getTitle())
+                .description(task.getNotes())
+                .status(status)
+                .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
+                .completed(completedDate)
+                .source(GOOGLE_TASKS)
+                .addTags(taskList.getTitle())
+                .build();
     }
 }

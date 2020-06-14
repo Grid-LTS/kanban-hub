@@ -7,10 +7,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface ITaskResourceRepo {
-    List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime)
-            throws IOException;
+    List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime);
+
+    List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime insertedAfterDateTime);
 
     void init(String accessToken);
+
     void initConsole();
 
     String getResourceType();

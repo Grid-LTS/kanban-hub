@@ -1,5 +1,6 @@
 package com.github.gridlts.kanbanhub.sources.api.dto;
 import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -21,10 +22,13 @@ public abstract class BaseTaskDto {
     @Nullable
     public abstract String getDescription();
 
+    public abstract TaskStatus getStatus();
+
     @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
     public abstract LocalDate getCreationDate();
 
     @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
+    @Nullable
     public abstract LocalDate getCompleted();
 
     @InjectCsvBindByNameAnnotation

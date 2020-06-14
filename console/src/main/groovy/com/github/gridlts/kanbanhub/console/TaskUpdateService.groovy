@@ -13,7 +13,7 @@ class TaskUpdateService {
     }
 
     void update() {
-        taskDbRepo.saveAllCompletedTasksConsole()
+        taskDbRepo.saveAllRecentTasksConsole()
     }
 }
 

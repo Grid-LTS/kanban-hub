@@ -1,6 +1,7 @@
 package com.github.gridlts.kanbanhub.repository;
 
 import com.github.gridlts.kanbanhub.model.TaskEntity;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,8 @@ public interface TaskRepository extends JpaRepository<TaskEntity, String> {
 
     List<TaskEntity> findAllByResource(String resourceType);
 
+    List<TaskEntity> findAllByResourceAndStatusAndInsertTimeAfter(String resourceType, TaskStatus status,
+                                                                  Instant lowerDateLimit);
     List<TaskEntity> findAllByResourceAndInsertTimeAfter(String resourceType,
-                                                         Instant lowerDateLimit);
+                                                                  Instant lowerDateLimit);
 }
