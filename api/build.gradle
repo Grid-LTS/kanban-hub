@@ -19,6 +19,11 @@ group 'com.github.gridlts'
 
 sourceCompatibility = 1.11
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
 dependencies {
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat

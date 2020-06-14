@@ -28,6 +28,9 @@ public class TaskEntity {
 
     private String description;
 
+    @Column(name="creation_date", nullable=false, columnDefinition = "date")
+    private Instant creationDate;
+
     @Column(name="completion_date", nullable=false, columnDefinition = "date")
     private Instant completionDate;
 

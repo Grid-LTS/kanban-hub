@@ -22,6 +22,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
+            <column name="creation_date" type="date">
+                <constraints nullable="false" />
+            </column>
             <column name="completion_date" type="date" >
                 <constraints nullable="false"/>
             </column>

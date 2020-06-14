@@ -3,6 +3,7 @@ package com.github.gridlts.kanbanhub.gtasks;
 import com.github.gridlts.kanbanhub.gtasks.service.GTasksApiService;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
@@ -121,10 +122,19 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
+                DateTime dateUpdated;
+                if (task.getCompleted() != null &&
+                        task.getUpdated().getValue() > task.getCompleted().getValue()) {
+                    // Todo use saved information of ongoing tasks
+                    dateUpdated = task.getCompleted();
+                } else {
+                    dateUpdated = task.getUpdated();
+                }
                 BaseTaskDto baseTaskDto = new BaseTaskDto.Builder()
                         .taskId(task.getId())
                         .title(task.getTitle())
                         .description(task.getNotes())
+                        .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
                         .completed(DateTimeHelper.convertGoogleTimeToDate(task.getCompleted()))
                         .source(GOOGLE_TASKS)
                         .addTags(taskList.getTitle())
