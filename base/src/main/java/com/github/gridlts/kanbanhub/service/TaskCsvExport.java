@@ -4,6 +4,7 @@ import com.github.gridlts.kanbanhub.config.AppConfig;
 import com.github.gridlts.kanbanhub.csv.CustomHeaderColumnNameMappingStrategy;
 import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.ImmutableBaseTaskDto;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -58,15 +59,16 @@ public class TaskCsvExport {
             isInitial = true;
             lastUpdatedDate = DateUtilities.getOldEnoughDate().toInstant();
         }
-        List<BaseTaskDto> newTasks = taskDbRepo.getAllTasksInsertedAfter(resourceType, lastUpdatedDate);
-        if (newTasks.size() == 0) {
+        List<BaseTaskDto> newCompletedTasks = taskDbRepo.getAllTasksUpdatedAfter(resourceType,
+                TaskStatus.COMPLETED, lastUpdatedDate);
+        if (newCompletedTasks.size() == 0) {
             return;
         }
         if (isInitial) {
             createExportFile(resourceType);
-            this.exportAllTasksInitial(resourceType, newTasks);
+            this.exportAllTasksInitial(resourceType, newCompletedTasks);
         } else {
-            this.addRecentCompletedTasksForType(resourceType, newTasks);
+            this.addRecentCompletedTasksForType(resourceType, newCompletedTasks);
         }
     }
 

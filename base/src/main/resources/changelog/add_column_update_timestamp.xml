@@ -1,0 +1,16 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="Gerd Friemel" id="add_column_creation_date">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="tasks" columnName="update_ts"/></not>
+        </preConditions>
+        <addColumn tableName="tasks" >
+            <column name="update_ts" type="timestamp" afterColumn="insert_ts" defaultValueDate="2000-01-01 00:00:00">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

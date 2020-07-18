@@ -20,6 +20,12 @@ public interface TaskRepository extends JpaRepository<TaskEntity, String> {
 
     List<TaskEntity> findAllByResourceAndStatusAndInsertTimeAfter(String resourceType, TaskStatus status,
                                                                   Instant lowerDateLimit);
+    List<TaskEntity> findAllByResourceAndStatusAndUpdateTimeAfter(String resourceType, TaskStatus status,
+                                                 Instant lowerDateLimit);
+
     List<TaskEntity> findAllByResourceAndInsertTimeAfter(String resourceType,
                                                                   Instant lowerDateLimit);
+
+    List<TaskEntity> findAllByResourceAndUpdateTimeAfter(String resourceType,
+                                                         Instant lowerDateLimit);
 }
