@@ -3,6 +3,7 @@ package com.github.gridlts.kanbanhub.model;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -20,9 +21,13 @@ public class TaskEntity {
     @Column(name = "resource_id", nullable = false, columnDefinition = "varchar(50)")
     private String resourceId;
 
-    @Column(name = "insert_ts", nullable = false, columnDefinition = "datetime(0")
+    @Column(name = "insert_ts", nullable = false, columnDefinition = "datetime(0)")
     @CreationTimestamp
     private Instant insertTime;
+
+    @Column(name = "update_ts", nullable = false, columnDefinition = "datetime(0)")
+    @UpdateTimestamp
+    private Instant updateTime;
 
     @Column(name = "title", nullable = false, columnDefinition = "varchar(255)")
     private String title;

@@ -7,6 +7,7 @@ import com.github.gridlts.kanbanhub.repository.LastUpdatedRepository;
 import com.github.gridlts.kanbanhub.repository.TaskRepository;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.map.HashedMap;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.*;
 import java.util.List;
 import java.util.Map;
@@ -119,9 +119,16 @@ public class TaskDbRepo {
         }
     }
 
-    public List<BaseTaskDto> getAllTasksInsertedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
-        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndInsertTimeAfter(
+    public List<BaseTaskDto> getAllTasksUpdatedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
+        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndUpdateTimeAfter(
                 resourceType.toString(), lowerTimeLimit);
+        return taskEntities.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
+    }
+
+    public List<BaseTaskDto> getAllTasksUpdatedAfter(TaskResourceType resourceType,
+                                                     TaskStatus status, Instant lowerTimeLimit) {
+        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndStatusAndUpdateTimeAfter(
+                resourceType.toString(), status, lowerTimeLimit);
         return taskEntities.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
     }
 
