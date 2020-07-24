@@ -48,7 +48,7 @@ public class GTaskController {
     public List<Task> getTasksForTaskList(@PathVariable String taskListId,
                                           @RequestHeader(name = "Authorization") String accessToken)
             throws IOException, GeneralSecurityException {
-        return gTaskRepo.getTasksForTaskListEntry(taskListId, accessToken);
+        return gTaskRepo.getOpenTasksForTaskListEntry(taskListId, accessToken);
     }
 
 }

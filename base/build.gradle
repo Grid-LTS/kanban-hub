@@ -1,5 +1,5 @@
 plugins {
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
     id 'java'
     id 'java-library'
 }
@@ -26,9 +26,9 @@ dependencies {
     runtimeOnly supportDependencies.hsqlDb
     implementation supportDependencies.liquibase
     implementation supportDependencies.findBugsJsr
-    implementation "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
-    implementation "com.github.gridlts.kanbanhub:taskwarrior-plugin:0.0.1-SNAPSHOT"
-    implementation project(':sources-api')
+    api "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
+    api "com.github.gridlts.kanbanhub:taskwarrior-plugin:0.0.1-SNAPSHOT"
+    api project(':sources-api')
     api supportDependencies.openCSV
     annotationProcessor supportDependencies.orgImmutables
     compileOnly supportDependencies.orgImmutablesBuilder

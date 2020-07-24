@@ -1,3 +1,18 @@
+management:
+  metrics:
+    enable:
+      all: false
+      jvm: true
+
+
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+endpoints:
+  prometheus:
+    enabled: true
 server:
   servlet:
     context-path: "/api"
