@@ -1,11 +1,11 @@
 ext {
     apacheCommonsVersion = "3.10"
     findbugsJsrVersion = "3.0.2"
-    springBootVersion = '2.2.5.RELEASE'
+    springBootVersion = "${springBootVersion}"
     springSecurityOauthVersion = "2.3.6.RELEASE"
     orgImmutablesVersion = "2.7.4"
     openCSVVersion = "4.6"
-    springVersion = "5.2.4.RELEASE"
+    springVersion = "5.2.8.RELEASE"
     hsqldbVersion = "2.5.0"
     jacksonVersion = "2.10.3"
     lombokVersion = "1.18.10"

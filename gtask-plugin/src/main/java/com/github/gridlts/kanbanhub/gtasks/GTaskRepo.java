@@ -79,7 +79,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         return taskLists;
     }
 
-    public List<Task> getTasksForTaskListEntry(String taskListId, String accessToken)
+    public List<Task> getOpenTasksForTaskListEntry(String taskListId, String accessToken)
             throws IOException, GeneralSecurityException {
         this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
         return this.getOpenTasksForTaskList(taskListId);
