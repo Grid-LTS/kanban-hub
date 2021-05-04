@@ -24,11 +24,11 @@ export default {
   components: { Login },
   methods: {
     updateIsSignedIn() {
-      this.isSignedIn = this.$isAuthenticated();
+      this.isSignedIn = this.$gapi.isAuthenticated();
     },
   },
   created() {
-    this.$getGapiClient()
+    this.$gapi.getGapiClient()
       .then((gapi) => {
         Object.defineProperty(Vue.prototype, '$currentUser', {
           get() { return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true); },

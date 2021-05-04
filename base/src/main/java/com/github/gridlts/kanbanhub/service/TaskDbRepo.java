@@ -10,17 +10,13 @@ import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.time.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,7 +31,7 @@ public class TaskDbRepo {
     @Autowired
     public TaskDbRepo(List<ITaskResourceRepo> repos, TaskRepository taskRepository,
                       LastUpdatedRepository lastUpdatedRepository) {
-        this.repos = new HashedMap<>();
+        this.repos = new HashMap<>();
         for (ITaskResourceRepo repo : repos) {
             this.repos.put(repo.getResourceType(), repo);
         }
@@ -102,7 +98,7 @@ public class TaskDbRepo {
 
     public void persistTasks(List<BaseTaskDto> tasks, String resourceType) {
         List<TaskEntity> existingTaskEntities = taskRepository.findAllByResource(resourceType);
-        Map<String, TaskEntity> existingTaskEntitiesByNativeId = new HashedMap<>();
+        Map<String, TaskEntity> existingTaskEntitiesByNativeId = new HashMap<>();
         existingTaskEntities.forEach(task -> existingTaskEntitiesByNativeId.put(task.getResourceId(), task));
         List<TaskEntity> taskEntities = tasks.stream()
                 .map(taskDto -> {

@@ -21,13 +21,21 @@ class ConsoleRunner implements ApplicationRunner {
 
     @Override
     void run(ApplicationArguments args) throws Exception  {
-        if (args.sourceArgs.contains("update")) {
+        def sourceArgs = args.sourceArgs
+        if (sourceArgs.contains("update")) {
             taskUpdateService.update()
+            sourceArgs -= "update"
         }
-        if (args.sourceArgs.contains("export")) {
+        if (sourceArgs.contains("export")) {
+            sourceArgs -= "export"
             if (args.sourceArgs.contains("--csv") || args.getOptionValues("csv")) {
+                sourceArgs -= "--csv"
                 taskCsvExport.exportAllCompletedTasks()
             }
+        }
+        if (sourceArgs.length > 0) {
+            def leftOverArgs = sourceArgs.join(", ")
+            println("Following arguments are not valid: ${leftOverArgs}")
         }
     }
 }

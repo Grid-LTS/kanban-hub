@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const getGTaskProperties = () => axios.get('/api/gtasks/properties');
-const getGTaskLists = options => axios.get('/api/gtasks/tasklists', options);
-const getGTaskTasksForList = (taskListId, options) => axios.get(`/api/gtasks/${taskListId}/tasks`, options);
-const saveAllGTaskCompleted = options => axios.post('/api/save/all', {}, options);
+const getGTaskProperties = () => axios.get('/api/google_tasks/properties');
+const getGTaskLists = options => axios.get('/api/google_tasks/tasklists', options);
+const getGTaskTasksForList = (taskListId, options) => axios.get(`/api/google_tasks/${taskListId}/tasks`, options);
+const saveAllGTaskCompleted = options => axios.post('/api/google_tasks/save/all', {}, options);
 
 export default {
   getGTaskProperties,

@@ -30,6 +30,7 @@ dependencies {
     implementation supportDependencies.springBootStarterWeb
     implementation supportDependencies.springBootStarterTomcat
     implementation 'io.micrometer:micrometer-registry-prometheus:1.5.1'
+    implementation supportDependencies.springBootStarterActuator
     //implementation 'io.micrometer:micrometer-spring-legacy:1.3.10'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation (project(':base'))

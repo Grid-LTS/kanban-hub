@@ -1,4 +1,5 @@
 package com.github.gridlts.kanbanhub.sources.api.dto;
+
 import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import org.immutables.value.Value;
@@ -37,6 +38,8 @@ public abstract class BaseTaskDto {
     @InjectCsvBindByNameAnnotation
     @Nullable
     public abstract String getProjectCode();
+
+    public abstract String getTaskListId();
 
     @InjectCsvBindAndSplitByNameAnnotation(elementType = String.class)
     public abstract List<String> getTags();

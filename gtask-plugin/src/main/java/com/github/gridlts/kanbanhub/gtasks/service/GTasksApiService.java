@@ -73,6 +73,7 @@ public class GTasksApiService {
             Credential cred = authorize();
             return instantiateGapiService(cred.getAccessToken());
         } catch (Exception e) {
+            // Todo : use logger
             System.out.println("Google Tasks authorization failed:");
             System.out.println(e);
             System.exit(0);

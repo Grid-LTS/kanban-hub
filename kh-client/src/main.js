@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import VueGAPI from 'vue-gapi';
+import VueGapi from 'vue-gapi';
 import App from './App';
 import router from './router';
 import './styles/main.scss';
@@ -17,7 +17,7 @@ api.getGTaskProperties().then(
   (response) => {
     if (response.data) {
       Object.assign(gTaskConfig, response.data);
-      Vue.use(VueGAPI, gTaskConfig);
+      Vue.use(VueGapi, gTaskConfig);
       /* eslint-disable no-new */
       new Vue({
         el: '#app',

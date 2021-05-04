@@ -29,10 +29,10 @@ export default {
   },
   methods: {
     handleAuthClick() {
-      this.$login();
+      this.$gapi.login();
     },
     handleSignoutClick() {
-      this.$logout();
+      this.$gapi.logout();
     },
   },
 };

@@ -3,12 +3,13 @@ management:
     enable:
       all: false
       jvm: true
-
-
   endpoints:
+    enabled-by-default: true
     web:
       exposure:
-        include: prometheus
+        include: "*"
+
+
 
 endpoints:
   prometheus:

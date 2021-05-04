@@ -1,7 +1,7 @@
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'java-library'
     id 'maven-publish'
@@ -32,6 +32,8 @@ dependencies {
     //testImplementation(supportDependencies.springBootStarterTest) {
     //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     //}
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }
 
 sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
