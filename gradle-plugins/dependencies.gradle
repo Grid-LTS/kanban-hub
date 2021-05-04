@@ -2,10 +2,10 @@ ext {
     apacheCommonsVersion = "3.10"
     findbugsJsrVersion = "3.0.2"
     springBootVersion = "${springBootVersion}"
-    springSecurityOauthVersion = "2.3.6.RELEASE"
+    springSecurityOauthVersion = "${springBootVersion}"
     orgImmutablesVersion = "2.7.4"
     openCSVVersion = "4.6"
-    springVersion = "5.2.8.RELEASE"
+    springVersion = "5.3.6"
     hsqldbVersion = "2.5.0"
     jacksonVersion = "2.10.3"
     lombokVersion = "1.18.10"
@@ -27,6 +27,7 @@ supportDependencies = [
         springBootStarterWeb            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
         springBootStarterJpa            : "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
         springBootStarterSecurity       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
+        springBootStarterActuator       : "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
         springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
         hsqlDb                          : "org.hsqldb:hsqldb:${hsqldbVersion}",
         liquibase                       : "org.liquibase:liquibase-core:${liquibaseVersion}",

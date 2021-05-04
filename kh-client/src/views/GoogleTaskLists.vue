@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     listTaskLists() {
-      this.$getGapiClient()
+      this.$gapi.getGapiClient()
         .then(() => {
           const options = { headers: { Authorization: `Bearer ${this.$currentUser.access_token}` } };
           api.getGTaskLists(options).then(

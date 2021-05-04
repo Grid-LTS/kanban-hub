@@ -1,12 +1,14 @@
 package com.github.gridlts.kanbanhub.taskw.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.gridlts.kanbanhub.helper.DateUtilities;
+import com.github.gridlts.kanbanhub.sources.api.ITaskResourceConfiguration;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
+import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
 import com.github.gridlts.kanbanhub.taskw.TaskWarriorConfig;
 import com.github.gridlts.kanbanhub.taskw.dto.TaskwDto;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -26,10 +28,10 @@ public class TaskwRepo implements ITaskResourceRepo {
     private static final String COMPLETED_TASKS_CMD_FORMAT = "task status:completed end.after=%s export";
     private static final String TASKS_CMD_FORMAT = "task modified.after=%s export";
 
-    private String storeDirectoryPath;
+    private TaskWarriorConfig taskWarriorConfig;
 
     public TaskwRepo(TaskWarriorConfig appConfig) {
-        this.storeDirectoryPath = appConfig.getStoreDirectoryPath();
+        this.taskWarriorConfig = appConfig;
     }
 
     // https://taskwarrior.org/docs/commands/export.html
@@ -47,13 +49,18 @@ public class TaskwRepo implements ITaskResourceRepo {
         return "taskwarrior";
     }
 
+    @Override
+    public ITaskResourceConfiguration getResourceConfiguration() {
+        return null;
+    }
+
 
     List<TaskwDto> getTasks(String command, ZonedDateTime newerThanDateTime) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 String.format(command, DateTimeHelper.convertZoneDateTimeToTaskwDate(newerThanDateTime))
                         .split(" "));
         builder.redirectErrorStream(true);
-        builder.directory(new File(this.storeDirectoryPath));
+        builder.directory(new File(this.taskWarriorConfig.getStoreDirectoryPath()));
         Process process = builder.start();
         ObjectMapper objectMapper = new ObjectMapper();
         List<TaskwDto> completedTaskw = new ArrayList<>();
@@ -89,6 +96,16 @@ public class TaskwRepo implements ITaskResourceRepo {
             convertedTaskList.add(baseTaskDto);
         }
         return convertedTaskList;
+    }
+
+    @Override
+    public List<TaskListDto> getTaskListsEntry(String s) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<BaseTaskDto> getOpenTasksForTaskListEntry(String s, String s1) {
+        throw new NotImplementedException();
     }
 
     @Override

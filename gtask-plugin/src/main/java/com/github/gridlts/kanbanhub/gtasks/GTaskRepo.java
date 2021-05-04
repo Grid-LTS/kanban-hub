@@ -1,14 +1,17 @@
 package com.github.gridlts.kanbanhub.gtasks;
 
 import com.github.gridlts.kanbanhub.gtasks.service.GTasksApiService;
+import com.github.gridlts.kanbanhub.sources.api.ITaskResourceConfiguration;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
+import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
 import com.google.api.services.tasks.model.TaskLists;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,22 +22,21 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.gridlts.kanbanhub.gtasks.DateTimeHelper.convertZoneDateTimeToRFC3339Timestamp;
 import static com.github.gridlts.kanbanhub.sources.api.TaskResourceType.GOOGLE_TASKS;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@RequiredArgsConstructor
 public class GTaskRepo implements ITaskResourceRepo {
 
     private static final Long MAX_RESULTS = 10000L;
 
     private Tasks tasksService;
-    private GTasksApiService gTasksApiService;
-
-    public GTaskRepo(GTasksApiService gTasksApiService) {
-        this.gTasksApiService = gTasksApiService;
-    }
+    private final GTasksApiService gTasksApiService;
+    private final GTasksConfiguration gTasksConfiguration;
 
     @Override
     public void init(String accessToken) {
@@ -49,7 +51,7 @@ public class GTaskRepo implements ITaskResourceRepo {
     }
 
     @Override
-    public void initConsole(){
+    public void initConsole() {
         this.tasksService = this.gTasksApiService.instantiateGapiServiceConsole();
     }
 
@@ -58,19 +60,32 @@ public class GTaskRepo implements ITaskResourceRepo {
         return "google_tasks";
     }
 
-    public List<TaskList> getTaskListsEntry(String accessToken) throws IOException, GeneralSecurityException {
-        this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
-        return this.getTaskLists();
+    @Override
+    public ITaskResourceConfiguration getResourceConfiguration() {
+        return gTasksConfiguration;
+    }
+
+    @Override
+    public List<TaskListDto> getTaskListsEntry(String accessToken) {
+        try {
+            this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
+            return this.getTaskLists().stream().map(this::mapTaskListToDto).collect(Collectors.toList());
+        } catch (IOException io) {
+
+        } catch (GeneralSecurityException generalSecurityException) {
+
+        }
+        return new ArrayList<>();
     }
 
     public List<TaskList> getTaskLists() {
         List<TaskList> taskLists = new ArrayList<>();
         try {
             TaskLists result = this.tasksService.tasklists().list()
-                    .setMaxResults(10L)
+                    .setMaxResults(20L)
                     .execute();
             taskLists = result.getItems();
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             return taskLists;
         }
         if (taskLists == null) {
@@ -79,10 +94,19 @@ public class GTaskRepo implements ITaskResourceRepo {
         return taskLists;
     }
 
-    public List<Task> getOpenTasksForTaskListEntry(String taskListId, String accessToken)
-            throws IOException, GeneralSecurityException {
-        this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
-        return this.getOpenTasksForTaskList(taskListId);
+    @Override
+    public List<BaseTaskDto> getOpenTasksForTaskListEntry(String taskListId, String accessToken) {
+        try {
+            this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
+            return this.getOpenTasksForTaskList(taskListId).stream()
+                    .map(task -> mapTaskToDto(task, taskListId))
+                    .collect(Collectors.toList());
+        } catch (IOException io) {
+
+        } catch (GeneralSecurityException generalSecurityException) {
+
+        }
+        return new ArrayList<>();
     }
 
     public List<Task> getOpenTasksForTaskList(String taskListId)
@@ -118,7 +142,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         return tasksForTaskList;
     }
 
-    public List<Task> getTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime){
+    public List<Task> getTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime) {
         List<Task> tasksForTaskList = new ArrayList<>();
         try {
             com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
@@ -151,7 +175,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
                 convertedTaskList.add(baseTaskDto);
             }
         }
@@ -159,7 +183,7 @@ public class GTaskRepo implements ITaskResourceRepo {
     }
 
     @Override
-    public List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime newerThanDateTime){
+    public List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime newerThanDateTime) {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskList taskList : taskLists) {
@@ -170,15 +194,21 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(newerThanDateTime)) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
                 convertedTaskList.add(baseTaskDto);
             }
         }
         return convertedTaskList;
     }
 
+    private TaskListDto mapTaskListToDto(TaskList taskList) {
+        return new TaskListDto.Builder()
+                .id(taskList.getId())
+                .title(taskList.getTitle())
+                .build();
+    }
 
-    private BaseTaskDto mapTaskToDto(Task task, TaskList taskList) {
+    private BaseTaskDto mapTaskToDto(Task task, String taskListId) {
         DateTime dateUpdated;
         if (task.getCompleted() != null &&
                 task.getUpdated().getValue() > task.getCompleted().getValue()) {
@@ -203,7 +233,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
                 .completed(completedDate)
                 .source(GOOGLE_TASKS)
-                .addTags(taskList.getTitle())
+                .taskListId(taskListId)
                 .build();
     }
 }

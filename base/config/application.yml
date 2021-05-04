@@ -3,9 +3,12 @@ application:
   fs:
     path: "${HOME}/.kanban-hub"
 
+
+
 # DataSource
 spring:
   config:
+    use-legacy-processing: true
     additional-location: "file:./config"
   datasource:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
