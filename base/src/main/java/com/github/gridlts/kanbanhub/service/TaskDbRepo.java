@@ -1,5 +1,6 @@
 package com.github.gridlts.kanbanhub.service;
 
+import com.github.gridlts.kanbanhub.exception.ResourceNotFoundException;
 import com.github.gridlts.kanbanhub.helper.DateUtilities;
 import com.github.gridlts.kanbanhub.model.LastUpdatedEntity;
 import com.github.gridlts.kanbanhub.model.TaskEntity;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TaskDbRepo {
 
+    public static final String TIME_RANGE_ALL = "all";
+    public static final String TIME_RANGE_RECENT = "recent";
+
     private TaskRepository taskRepository;
     private LastUpdatedRepository lastUpdatedRepository;
     private Map<String, ITaskResourceRepo> repos;
@@ -46,11 +50,22 @@ public class TaskDbRepo {
         }
     }
 
+    public void saveAllTasksAuthentified(String resourceType, String range, String accessToken) {
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        resourceRepo.init(accessToken);
+        if (TIME_RANGE_RECENT.equals(range)) {
+            saveAllRecentTasksForType(resourceType);
+        }
+        if (TIME_RANGE_ALL.equals(range)) {
+            syncAllTasksInitial(resourceType);
+        }
+    }
+
     public void saveAllRecentTasksForType(String resourceType) {
         boolean tasksSaved;
         Optional<ZonedDateTime> lastUpdatedTime = getLastUpdatedTime(resourceType);
         if (lastUpdatedTime.isEmpty()) {
-            tasksSaved = saveAllTasksInitial(resourceType);
+            tasksSaved = syncAllTasksInitial(resourceType);
         } else {
             tasksSaved = addRecentTasksForType(resourceType, lastUpdatedTime.get());
         }
@@ -67,10 +82,10 @@ public class TaskDbRepo {
         return recentTasks.size() > 0;
     }
 
-    public ITaskResourceRepo getRepoForResourceType(String resourceType) {
+    private ITaskResourceRepo getRepoForResourceType(String resourceType) {
         ITaskResourceRepo resourceRepo = repos.get(resourceType);
         if (resourceRepo == null) {
-            throw new RuntimeException("Unknown Resource type");
+            throw new ResourceNotFoundException(resourceType);
         }
         return resourceRepo;
     }
@@ -88,11 +103,12 @@ public class TaskDbRepo {
         lastUpdatedRepository.save(lastUpdatedTimestamp);
     }
 
-    public Boolean saveAllTasksInitial(String resourceType) {
+    public Boolean syncAllTasksInitial(String resourceType) {
         ZonedDateTime startDateTime = DateUtilities.getOldEnoughDate();
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> initialTaskList = resourceRepo.getAllTasksNewerThan(startDateTime);
         persistTasks(initialTaskList, resourceType);
+        deleteTasks(resourceType, startDateTime);
         return initialTaskList.size() > 0;
     }
 
@@ -103,17 +119,36 @@ public class TaskDbRepo {
         List<TaskEntity> taskEntities = tasks.stream()
                 .map(taskDto -> {
                     if (existingTaskEntitiesByNativeId.containsKey(taskDto.getTaskId())) {
-                        return this.updateTaskEntityWithDto(taskDto,
-                                existingTaskEntitiesByNativeId.get(taskDto.getTaskId()));
+                        TaskEntity taskEntity = existingTaskEntitiesByNativeId.get(taskDto.getTaskId());
+                        if (!isTaskEntityToBeUpdated(taskEntity, taskDto)) {
+                            return null;
+                        }
+                        return this.updateTaskEntityWithTaskDto(taskDto, taskEntity);
                     } else {
                         return this.convertTaskToNewModel(taskDto);
                     }
-                }).collect(Collectors.toList());
+                }).filter(Objects::nonNull).collect(Collectors.toList());
         taskRepository.saveAll(taskEntities);
-        for (BaseTaskDto task : tasks) {
+        for (TaskEntity task : taskEntities) {
             log.info("Saved task {}, tagged {}", task.getTitle(), task.getTags());
         }
     }
+
+    public void deleteTasks(String resourceType, ZonedDateTime startDateTime) {
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        List<BaseTaskDto> deletedTasks = resourceRepo.getDeletedTasks(startDateTime);
+        for (BaseTaskDto deletedTask : deletedTasks) {
+            Optional<TaskEntity> deletedTaskEntityOptional = taskRepository.findDistinctByResourceAndResourceId(resourceType,
+                    deletedTask.getTaskId());
+            deletedTaskEntityOptional.ifPresent(taskEntity -> {
+                log.info("Delete task: resource={}, title={}, list={}, description={}, created={}.",
+                        taskEntity.getResource(), taskEntity.getTitle(), taskEntity.getProjectCode(),
+                        taskEntity.getDescription(), taskEntity.getCreationDate());
+                taskRepository.delete(taskEntity);
+            });
+        }
+    }
+
 
     public List<BaseTaskDto> getAllTasksUpdatedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
         List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndUpdateTimeAfter(
@@ -137,8 +172,15 @@ public class TaskDbRepo {
         return updateTaskEntityWithTaskDto(task, taskEntity);
     }
 
-    private TaskEntity updateTaskEntityWithDto(BaseTaskDto task, TaskEntity taskEntity) {
-        return updateTaskEntityWithTaskDto(task, taskEntity);
+    private boolean isTaskEntityToBeUpdated(TaskEntity taskEntity, BaseTaskDto task) {
+        return !taskEntity.getTitle().equals(task.getTitle())
+                || !taskEntity.getResourceId().equals(task.getTaskId())
+                || (taskEntity.getCompletionDate() == null && task.getCompleted() != null)
+                || (taskEntity.getDescription() != null
+                && !taskEntity.getDescription().equals(task.getDescription()))
+                || (taskEntity.getProjectCode() != null && !taskEntity.getProjectCode().equals(task.getProjectCode()))
+                || (taskEntity.getTags() != null && !taskEntity.getTags().equals(task.getTags()))
+                || (!taskEntity.getStatus().equals(task.getStatus()));
     }
 
     private TaskEntity updateTaskEntityWithTaskDto(BaseTaskDto task, TaskEntity taskEntity) {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.gridlts.kanbanhub.service.TaskDbRepo.TIME_RANGE_RECENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -31,10 +32,9 @@ public class MainTaskController {
 
     @RequestMapping(value = "/{resource}/save", method = RequestMethod.POST)
     public void saveAllTasks(@RequestHeader(name = "Authorization") String accessToken,
-                             @PathVariable String resource) {
-        if (!repos.containsKey(resource)) {
-            throw new ResourceNotFoundException(resource);
-        }
+                             @PathVariable String resource,
+                             @RequestParam(value="range", defaultValue = TIME_RANGE_RECENT) String range) {
+        taskRepo.saveAllTasksAuthentified(resource, range, accessToken);
     }
 
     @RequestMapping(value = "/{resourceId}/properties", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)

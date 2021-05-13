@@ -17,6 +17,8 @@ public interface ITaskResourceRepo {
 
     List<BaseTaskDto> getAllTasksNewerThan(ZonedDateTime insertedAfterDateTime);
 
+    List<BaseTaskDto> getDeletedTasks(ZonedDateTime newerThanDateTime);
+
     void init(String accessToken);
 
     void initConsole();

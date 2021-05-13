@@ -142,13 +142,15 @@ public class GTaskRepo implements ITaskResourceRepo {
         return tasksForTaskList;
     }
 
-    public List<Task> getTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime) {
+    public List<Task> getTasksForTaskList(String taskListId, ZonedDateTime newerThanDateTime,
+                                          boolean showCompleted, boolean showDeleted) {
         List<Task> tasksForTaskList = new ArrayList<>();
         try {
             com.google.api.services.tasks.model.Tasks result = this.tasksService.tasks().list(taskListId)
                     .setMaxResults(MAX_RESULTS)
                     .setUpdatedMin(convertZoneDateTimeToRFC3339Timestamp(newerThanDateTime))
-                    .setShowCompleted(true)
+                    .setShowCompleted(showCompleted)
+                    .setShowDeleted(showDeleted)
                     .setShowHidden(true)
                     .execute();
             tasksForTaskList = result.getItems();
@@ -187,7 +189,8 @@ public class GTaskRepo implements ITaskResourceRepo {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
         for (TaskList taskList : taskLists) {
-            List<Task> tasks = this.getTasksForTaskList(taskList.getId(), newerThanDateTime);
+            List<Task> tasks = this.getTasksForTaskList(taskList.getId(), newerThanDateTime,
+                    true, false);
             for (Task task : tasks) {
                 // consistency checks before conversion for saving to file
                 ZonedDateTime taskDateTime = DateTimeHelper.convertGoogleTimeToZonedDateTime(task.getUpdated());
@@ -200,6 +203,26 @@ public class GTaskRepo implements ITaskResourceRepo {
         }
         return convertedTaskList;
     }
+
+    @Override
+    public List<BaseTaskDto> getDeletedTasks(ZonedDateTime newerThanDateTime) {
+        List<TaskList> taskLists = this.getTaskLists();
+        List<BaseTaskDto> deletedList = new ArrayList<>();
+        for (TaskList taskList : taskLists) {
+            List<Task> tasksForTaskList = this.getTasksForTaskList(taskList.getId(),
+                    newerThanDateTime, false, true);
+            for (Task task : tasksForTaskList) {
+                if (task.getDeleted() == null || !task.getDeleted()) {
+                    continue;
+                }
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
+                deletedList.add(baseTaskDto);
+            }
+        }
+        return deletedList;
+    }
+
+
 
     private TaskListDto mapTaskListToDto(TaskList taskList) {
         return new TaskListDto.Builder()

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="actions">
-      <button v-on:click="saveAllTasksCompleted">Save All completed</button>
+      <button v-on:click="saveAllTasksCompleted">Sync all tasks with DB</button>
       <p>{{ apiMessage }}</p>
     </div>
     <div v-if="doneLoading">
