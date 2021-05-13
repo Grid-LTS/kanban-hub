@@ -99,6 +99,11 @@ public class TaskwRepo implements ITaskResourceRepo {
     }
 
     @Override
+    public List<BaseTaskDto> getDeletedTasks(ZonedDateTime zonedDateTime) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<TaskListDto> getTaskListsEntry(String s) {
         throw new NotImplementedException();
     }

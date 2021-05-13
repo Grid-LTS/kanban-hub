@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation (project(':base'))
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
 }
 
 sourceSets.main.java.srcDirs = ['src/main/java']

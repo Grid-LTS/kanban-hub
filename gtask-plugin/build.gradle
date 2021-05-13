@@ -7,6 +7,8 @@ plugins {
     id 'maven-publish'
 }
 
+apply from: file(getRootDir().parent + '/gradle-plugins/dependencies.gradle')
+
 apply plugin: 'io.spring.dependency-management'
 
 group 'com.github.gridlts.kanbanhub'
@@ -32,8 +34,8 @@ dependencies {
     //testImplementation(supportDependencies.springBootStarterTest) {
     //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     //}
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
 }
 
 sourceSets.main.java.srcDirs = ['build/generated','src/main/java']

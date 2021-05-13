@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, String> {
@@ -17,6 +18,8 @@ public interface TaskRepository extends JpaRepository<TaskEntity, String> {
     LocalDate getMaxCompletionDate();
 
     List<TaskEntity> findAllByResource(String resourceType);
+
+    Optional<TaskEntity> findDistinctByResourceAndResourceId(String resourceType, String resourceId);
 
     List<TaskEntity> findAllByResourceAndStatusAndInsertTimeAfter(String resourceType, TaskStatus status,
                                                                   Instant lowerDateLimit);
