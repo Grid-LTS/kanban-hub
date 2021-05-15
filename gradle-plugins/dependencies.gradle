@@ -8,6 +8,7 @@ ext {
     springVersion = "5.3.6"
     hsqldbVersion = "2.5.0"
     jacksonVersion = "2.10.3"
+    logbackVersion = "1.2.3"
     lombokVersion = "1.18.20"
     liquibaseVersion = "3.8.9"
 
@@ -31,12 +32,13 @@ supportDependencies = [
         springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
         hsqlDb                          : "org.hsqldb:hsqldb:${hsqldbVersion}",
         liquibase                       : "org.liquibase:liquibase-core:${liquibaseVersion}",
+        logback                         : "ch.qos.logback:logback-classic:${logbackVersion}",
         orgImmutables                   : "org.immutables:value:${orgImmutablesVersion}",
         orgImmutablesAnnotations        : "org.immutables:value:${orgImmutablesVersion}:annotations",
         orgImmutablesBuilder            : "org.immutables:builder:${orgImmutablesVersion}",
         orgImmutablesGson               : "org.immutables:gson:${orgImmutablesVersion}",
         orgImmutablesAnnotate           : "org.immutables:annotate:${orgImmutablesVersion}",
         openCSV                         : "com.opencsv:opencsv:${openCSVVersion}",
-        projectLombok                    : "org.projectlombok:lombok:${lombokVersion}"
+        projectLombok                   : "org.projectlombok:lombok:${lombokVersion}"
 ]
 }

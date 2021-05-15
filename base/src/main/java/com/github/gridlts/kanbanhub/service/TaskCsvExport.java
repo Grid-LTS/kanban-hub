@@ -59,8 +59,7 @@ public class TaskCsvExport {
             isInitial = true;
             lastUpdatedDate = DateUtilities.getOldEnoughDate().toInstant();
         }
-        List<BaseTaskDto> newCompletedTasks = taskDbRepo.getAllTasksUpdatedAfter(resourceType,
-                TaskStatus.COMPLETED, lastUpdatedDate);
+        List<BaseTaskDto> newCompletedTasks = taskDbRepo.getAllTasksCompletedAfter(resourceType, lastUpdatedDate);
         if (newCompletedTasks.size() == 0) {
             return;
         }

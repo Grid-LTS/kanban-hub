@@ -39,8 +39,6 @@ public abstract class BaseTaskDto {
     @Nullable
     public abstract String getProjectCode();
 
-    public abstract String getTaskListId();
-
     @InjectCsvBindAndSplitByNameAnnotation(elementType = String.class)
     public abstract List<String> getTags();
 

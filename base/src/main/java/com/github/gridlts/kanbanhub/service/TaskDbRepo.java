@@ -78,8 +78,46 @@ public class TaskDbRepo {
     public boolean addRecentTasksForType(String resourceType, ZonedDateTime lastSavedTime) {
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> recentTasks = resourceRepo.getAllTasksNewerThan(lastSavedTime);
-        persistTasks(recentTasks, resourceType);
+        persistTasks(recentTasks, resourceType, new ArrayList<>());
         return recentTasks.size() > 0;
+    }
+
+    public Boolean syncAllTasksInitial(String resourceType) {
+        ZonedDateTime startDateTime = DateUtilities.getOldEnoughDate();
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        List<BaseTaskDto> initialTaskList = resourceRepo.getAllTasksNewerThan(startDateTime);
+        List<TaskEntity> leftOver = new ArrayList<>();
+        persistTasks(initialTaskList, resourceType, leftOver);
+        for (TaskEntity taskEntity : leftOver) {
+            if (TaskStatus.COMPLETED == taskEntity.getStatus()) {
+                continue;
+            }
+            deleteTask(taskEntity);
+        }
+        deleteTasksDeletedUpstream(resourceType, startDateTime);
+        return initialTaskList.size() > 0;
+    }
+
+    public void deleteTasksDeletedUpstream(String resourceType, ZonedDateTime startDateTime) {
+        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
+        List<BaseTaskDto> deletedTasks = resourceRepo.getDeletedTasks(startDateTime);
+        for (BaseTaskDto deletedTask : deletedTasks) {
+            Optional<TaskEntity> deletedTaskEntityOptional = taskRepository.findDistinctByResourceAndResourceId(resourceType,
+                    deletedTask.getTaskId());
+            deletedTaskEntityOptional.ifPresent(this::deleteTask);
+        }
+    }
+
+    public List<BaseTaskDto> getAllTasksCompletedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
+        return getAllTasksUpdatedAfter(resourceType, TaskStatus.COMPLETED, lowerTimeLimit)
+                .stream().filter(taskEntity -> !taskEntity.getCompletionDate().isBefore(lowerTimeLimit))
+                .map(this::convertTaskToNewModel).collect(Collectors.toList());
+    }
+
+    private List<TaskEntity> getAllTasksUpdatedAfter(TaskResourceType resourceType,
+                                                    TaskStatus status, Instant lowerTimeLimit) {
+        return taskRepository.findAllByResourceAndStatusAndUpdateTimeAfter(
+                resourceType.toString(), status, lowerTimeLimit);
     }
 
     private ITaskResourceRepo getRepoForResourceType(String resourceType) {
@@ -90,12 +128,12 @@ public class TaskDbRepo {
         return resourceRepo;
     }
 
-    public Optional<ZonedDateTime> getLastUpdatedTime(String resourceType) {
+    private Optional<ZonedDateTime> getLastUpdatedTime(String resourceType) {
         return lastUpdatedRepository.findOneByResource(resourceType).map
                 (lastUpdated -> lastUpdated.getLastUpdated().atZone(ZoneId.of("UTC")));
     }
 
-    public void updateTimestamp(String resourceType) {
+    private void updateTimestamp(String resourceType) {
         LastUpdatedEntity lastUpdatedTimestamp = lastUpdatedRepository
                 .findOneByResource(resourceType).orElse(new LastUpdatedEntity());
         lastUpdatedTimestamp.setResource(resourceType);
@@ -103,16 +141,7 @@ public class TaskDbRepo {
         lastUpdatedRepository.save(lastUpdatedTimestamp);
     }
 
-    public Boolean syncAllTasksInitial(String resourceType) {
-        ZonedDateTime startDateTime = DateUtilities.getOldEnoughDate();
-        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
-        List<BaseTaskDto> initialTaskList = resourceRepo.getAllTasksNewerThan(startDateTime);
-        persistTasks(initialTaskList, resourceType);
-        deleteTasks(resourceType, startDateTime);
-        return initialTaskList.size() > 0;
-    }
-
-    public void persistTasks(List<BaseTaskDto> tasks, String resourceType) {
+    private void persistTasks(List<BaseTaskDto> tasks, String resourceType, List<TaskEntity> leftOver) {
         List<TaskEntity> existingTaskEntities = taskRepository.findAllByResource(resourceType);
         Map<String, TaskEntity> existingTaskEntitiesByNativeId = new HashMap<>();
         existingTaskEntities.forEach(task -> existingTaskEntitiesByNativeId.put(task.getResourceId(), task));
@@ -120,6 +149,7 @@ public class TaskDbRepo {
                 .map(taskDto -> {
                     if (existingTaskEntitiesByNativeId.containsKey(taskDto.getTaskId())) {
                         TaskEntity taskEntity = existingTaskEntitiesByNativeId.get(taskDto.getTaskId());
+                        existingTaskEntitiesByNativeId.remove(taskDto.getTaskId());
                         if (!isTaskEntityToBeUpdated(taskEntity, taskDto)) {
                             return null;
                         }
@@ -128,39 +158,19 @@ public class TaskDbRepo {
                         return this.convertTaskToNewModel(taskDto);
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
+        leftOver.addAll(existingTaskEntitiesByNativeId.values());
         taskRepository.saveAll(taskEntities);
         for (TaskEntity task : taskEntities) {
-            log.info("Saved task {}, tagged {}", task.getTitle(), task.getTags());
+            log.info("Saved task {}, tagged {}, resource {}", task.getTitle(), task.getTags(), resourceType);
         }
     }
 
-    public void deleteTasks(String resourceType, ZonedDateTime startDateTime) {
-        ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
-        List<BaseTaskDto> deletedTasks = resourceRepo.getDeletedTasks(startDateTime);
-        for (BaseTaskDto deletedTask : deletedTasks) {
-            Optional<TaskEntity> deletedTaskEntityOptional = taskRepository.findDistinctByResourceAndResourceId(resourceType,
-                    deletedTask.getTaskId());
-            deletedTaskEntityOptional.ifPresent(taskEntity -> {
-                log.info("Delete task: resource={}, title={}, list={}, description={}, created={}.",
-                        taskEntity.getResource(), taskEntity.getTitle(), taskEntity.getProjectCode(),
-                        taskEntity.getDescription(), taskEntity.getCreationDate());
-                taskRepository.delete(taskEntity);
-            });
-        }
-    }
-
-
-    public List<BaseTaskDto> getAllTasksUpdatedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
-        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndUpdateTimeAfter(
-                resourceType.toString(), lowerTimeLimit);
-        return taskEntities.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
-    }
-
-    public List<BaseTaskDto> getAllTasksUpdatedAfter(TaskResourceType resourceType,
-                                                     TaskStatus status, Instant lowerTimeLimit) {
-        List<TaskEntity> taskEntities = taskRepository.findAllByResourceAndStatusAndUpdateTimeAfter(
-                resourceType.toString(), status, lowerTimeLimit);
-        return taskEntities.stream().map(this::convertTaskToNewModel).collect(Collectors.toList());
+    private void deleteTask(TaskEntity taskEntity) {
+        log.info("Delete task: resource={}, title={}, tags={}, projectCode={}, description={}, created={}.",
+                taskEntity.getResource(), taskEntity.getTitle(), taskEntity.getTags(),
+                taskEntity.getProjectCode(), taskEntity.getDescription(),
+                taskEntity.getCreationDate());
+        taskRepository.delete(taskEntity);
     }
 
     private TaskEntity convertTaskToNewModel(BaseTaskDto task) {

@@ -12,6 +12,7 @@ import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
 import com.google.api.services.tasks.model.TaskLists;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ import static com.github.gridlts.kanbanhub.sources.api.TaskResourceType.GOOGLE_T
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Slf4j
 @RequiredArgsConstructor
 public class GTaskRepo implements ITaskResourceRepo {
 
@@ -99,7 +101,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         try {
             this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
             return this.getOpenTasksForTaskList(taskListId).stream()
-                    .map(task -> mapTaskToDto(task, taskListId))
+                    .map(task -> mapTaskToDto(task))
                     .collect(Collectors.toList());
         } catch (IOException io) {
 
@@ -177,7 +179,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
+                BaseTaskDto baseTaskDto = mapTaskToDto(task);
                 convertedTaskList.add(baseTaskDto);
             }
         }
@@ -197,7 +199,12 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(newerThanDateTime)) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
+                if (task.getHidden() != null && task.getHidden()) {
+                    log.info("Hidden task: resource={}, title={}, list={}, description={}, updated={}.",
+                            getResourceType(), task.getTitle(), taskList.getTitle(), task.getNotes(),
+                            task.getUpdated());
+                }
+                BaseTaskDto baseTaskDto = mapTaskToDto(task);
                 convertedTaskList.add(baseTaskDto);
             }
         }
@@ -215,7 +222,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (task.getDeleted() == null || !task.getDeleted()) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList.getId());
+                BaseTaskDto baseTaskDto = mapTaskToDto(task);
                 deletedList.add(baseTaskDto);
             }
         }
@@ -231,7 +238,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .build();
     }
 
-    private BaseTaskDto mapTaskToDto(Task task, String taskListId) {
+    private BaseTaskDto mapTaskToDto(Task task) {
         DateTime dateUpdated;
         if (task.getCompleted() != null &&
                 task.getUpdated().getValue() > task.getCompleted().getValue()) {
@@ -256,7 +263,6 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
                 .completed(completedDate)
                 .source(GOOGLE_TASKS)
-                .taskListId(taskListId)
                 .build();
     }
 }
