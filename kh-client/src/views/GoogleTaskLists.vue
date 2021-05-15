@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="actions">
-      <button v-on:click="saveAllTasksCompleted">Sync all tasks with DB</button>
+      <button v-on:click="syncAllNewTaskUpdates">Sync all tasks with DB</button>
       <p>{{ apiMessage }}</p>
     </div>
     <div v-if="doneLoading">
@@ -40,11 +40,11 @@ export default {
           );
         });
     },
-    saveAllTasksCompleted() {
+    syncAllNewTaskUpdates() {
       const options = { headers: { Authorization: `Bearer ${this.$currentUser.access_token}` } };
-      api.saveAllGTaskCompleted(options).then(
+      api.saveRecentGTaskCompleted(options).then(
         () => {
-          this.apiMessage = 'Stored all completed tasks.';
+          this.apiMessage = 'Synced all recent task updates.';
         },
       );
     },
