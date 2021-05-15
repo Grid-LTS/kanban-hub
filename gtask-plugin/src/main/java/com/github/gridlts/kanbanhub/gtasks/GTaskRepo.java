@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.github.gridlts.kanbanhub.gtasks.DateTimeHelper.convertZoneDateTimeToRFC3339Timestamp;
@@ -80,28 +81,16 @@ public class GTaskRepo implements ITaskResourceRepo {
         return new ArrayList<>();
     }
 
-    public List<TaskList> getTaskLists() {
-        List<TaskList> taskLists = new ArrayList<>();
-        try {
-            TaskLists result = this.tasksService.tasklists().list()
-                    .setMaxResults(20L)
-                    .execute();
-            taskLists = result.getItems();
-        } catch (IOException ex) {
-            return taskLists;
-        }
-        if (taskLists == null) {
-            taskLists = new ArrayList<>();
-        }
-        return taskLists;
-    }
-
     @Override
     public List<BaseTaskDto> getOpenTasksForTaskListEntry(String taskListId, String accessToken) {
+        Optional<TaskList> taskListOptional = getTaskList(taskListId);
+        if (taskListOptional.isEmpty()) {
+            return new ArrayList<>();
+        }
         try {
             this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
             return this.getOpenTasksForTaskList(taskListId).stream()
-                    .map(task -> mapTaskToDto(task))
+                    .map(task -> mapTaskToDto(task, taskListOptional.get()))
                     .collect(Collectors.toList());
         } catch (IOException io) {
 
@@ -179,7 +168,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(completedAfterDateTime)) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task);
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
                 convertedTaskList.add(baseTaskDto);
             }
         }
@@ -199,12 +188,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (taskDateTime.isBefore(newerThanDateTime)) {
                     continue;
                 }
-                if (task.getHidden() != null && task.getHidden()) {
-                    log.info("Hidden task: resource={}, title={}, list={}, description={}, updated={}.",
-                            getResourceType(), task.getTitle(), taskList.getTitle(), task.getNotes(),
-                            task.getUpdated());
-                }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task);
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
                 convertedTaskList.add(baseTaskDto);
             }
         }
@@ -222,14 +206,39 @@ public class GTaskRepo implements ITaskResourceRepo {
                 if (task.getDeleted() == null || !task.getDeleted()) {
                     continue;
                 }
-                BaseTaskDto baseTaskDto = mapTaskToDto(task);
+                BaseTaskDto baseTaskDto = mapTaskToDto(task, taskList);
                 deletedList.add(baseTaskDto);
             }
         }
         return deletedList;
     }
 
+    private List<TaskList> getTaskLists() {
+        List<TaskList> taskLists = new ArrayList<>();
+        try {
+            TaskLists result = this.tasksService.tasklists().list()
+                    .setMaxResults(20L)
+                    .execute();
+            if (result == null) {
+                return taskLists;
+            }
+            taskLists = result.getItems();
+        } catch (IOException ex) {
+            return taskLists;
+        }
+        if (taskLists == null) {
+            taskLists = new ArrayList<>();
+        }
+        return taskLists;
+    }
 
+    private Optional<TaskList> getTaskList(String taskListId) {
+        try {
+            return Optional.of(this.tasksService.tasklists().get(taskListId).execute());
+        } catch (IOException ex) {
+            return Optional.empty();
+        }
+    }
 
     private TaskListDto mapTaskListToDto(TaskList taskList) {
         return new TaskListDto.Builder()
@@ -238,7 +247,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .build();
     }
 
-    private BaseTaskDto mapTaskToDto(Task task) {
+    private BaseTaskDto mapTaskToDto(Task task, TaskList taskList) {
         DateTime dateUpdated;
         if (task.getCompleted() != null &&
                 task.getUpdated().getValue() > task.getCompleted().getValue()) {
@@ -263,6 +272,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
                 .completed(completedDate)
                 .source(GOOGLE_TASKS)
+                .addTags(taskList.getTitle())
                 .build();
     }
 }
