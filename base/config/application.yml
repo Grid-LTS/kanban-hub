@@ -2,7 +2,7 @@
 application:
   fs:
     path: "${HOME}/.kanban-hub"
-
+# can be overwritten in a application-default.yml
 
 
 # DataSource
