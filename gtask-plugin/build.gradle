@@ -1,7 +1,7 @@
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
     id 'java'
     id 'java-library'
     id 'maven-publish'

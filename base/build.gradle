@@ -28,6 +28,7 @@ dependencies {
     implementation supportDependencies.findBugsJsr
     api "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
     api "com.github.gridlts.kanbanhub:taskwarrior-plugin:0.0.1-SNAPSHOT"
+    // api "com.github.gridlts.kanbanhub:pocket-plugin:0.0.1-SNAPSHOT"
     api project(':sources-api')
     api supportDependencies.openCSV
     annotationProcessor supportDependencies.orgImmutables

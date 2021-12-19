@@ -3,7 +3,8 @@ gtasks:
     client_id: <Google client id>
     scope: 'https://www.googleapis.com/auth/tasks.readonly'
 
-store:
-  path: "<dir where files go>"
-
 gtasks.url.root=https://www.googleapis.com/
+
+pocket.consumer_key=
+
+store.path=<dir where files go>
