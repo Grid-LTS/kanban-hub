@@ -1,21 +1,21 @@
 package com.github.gridlts.kanbanhub.sources.api;
 
-import org.apache.commons.collections4.map.HashedMap;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public enum TaskResourceType {
 
     GOOGLE_TASKS("google_tasks"),
-
-    TASKWARRIOR("taskwarrior");
+    TASKWARRIOR("taskwarrior"),
+    TODOTXT("todotxt");
 
     private String resourceType;
-    public static Map<String, TaskResourceType> mapping = new HashedMap<>();
+    public static Map<String, TaskResourceType> mapping = new HashMap<>();
 
     static {
         mapping.put(GOOGLE_TASKS.toString(), GOOGLE_TASKS);
         mapping.put(TASKWARRIOR.toString(), TASKWARRIOR);
+        mapping.put(TODOTXT.toString(), TODOTXT);
 
     }
 

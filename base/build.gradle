@@ -9,7 +9,7 @@ apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 group 'com.github.gridlts'
 
-sourceCompatibility = 1.11
+sourceCompatibility = 1.17
 
 repositories {
     mavenCentral()

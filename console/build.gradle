@@ -19,7 +19,7 @@ bootRun{
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:3.0.1'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
     implementation supportDependencies.springBootAutoConfigure
     implementation (project(':base'))
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

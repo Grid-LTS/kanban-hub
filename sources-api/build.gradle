@@ -10,7 +10,7 @@ group 'com.github.gridlts.kanbanhub'
 version  '0.0.1-SNAPSHOT'
 
 
-sourceCompatibility = 1.11
+sourceCompatibility = 1.17
 
 repositories {
     mavenLocal()

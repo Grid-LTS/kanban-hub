@@ -23,6 +23,10 @@ public class DateTimeHelper {
         return ZonedDateTime.parse(dateTime.toStringRfc3339(), RFC_3339_FORMATTER);
     }
 
+    public static ZonedDateTime convertGoogleTimeToZonedDateTime(String dateTime) {
+        return ZonedDateTime.parse(dateTime, RFC_3339_FORMATTER);
+    }
+
     public static String convertZoneDateTimeToRFC3339Timestamp(ZonedDateTime zonedDateTime) {
         return zonedDateTime.format(RFC_3339_FORMATTER);
     }
