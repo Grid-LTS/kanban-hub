@@ -143,13 +143,18 @@ public class TaskDbRepo {
 
     private void persistTasks(List<BaseTaskDto> tasks, String resourceType, List<TaskEntity> leftOver) {
         List<TaskEntity> existingTaskEntities = taskRepository.findAllByResource(resourceType);
-        Map<String, TaskEntity> existingTaskEntitiesByNativeId = new HashMap<>();
-        existingTaskEntities.forEach(task -> existingTaskEntitiesByNativeId.put(task.getResourceId(), task));
+        Map<String, TaskEntity> existingTaskEntitiesByTitleAndDate = new HashMap<>();
+        // use creation date + task title as identifier because some task managers do not define a
+        // native id for their tasks
+        existingTaskEntities.forEach(task -> existingTaskEntitiesByTitleAndDate
+                .put(getTaskIdentifier(task), task)
+        );
         List<TaskEntity> taskEntities = tasks.stream()
                 .map(taskDto -> {
-                    if (existingTaskEntitiesByNativeId.containsKey(taskDto.getTaskId())) {
-                        TaskEntity taskEntity = existingTaskEntitiesByNativeId.get(taskDto.getTaskId());
-                        existingTaskEntitiesByNativeId.remove(taskDto.getTaskId());
+                    String identifier = getTaskIdentifier(taskDto);
+                    if (existingTaskEntitiesByTitleAndDate.containsKey(identifier)) {
+                        TaskEntity taskEntity = existingTaskEntitiesByTitleAndDate.get(identifier);
+                        existingTaskEntitiesByTitleAndDate.remove(identifier);
                         if (!isTaskEntityToBeUpdated(taskEntity, taskDto)) {
                             return null;
                         }
@@ -158,11 +163,25 @@ public class TaskDbRepo {
                         return this.convertTaskToNewModel(taskDto);
                     }
                 }).filter(Objects::nonNull).collect(Collectors.toList());
-        leftOver.addAll(existingTaskEntitiesByNativeId.values());
+        leftOver.addAll(existingTaskEntitiesByTitleAndDate.values());
         taskRepository.saveAll(taskEntities);
         for (TaskEntity task : taskEntities) {
             log.info("Saved task {}, tagged {}, resource {}", task.getTitle(), task.getTags(), resourceType);
         }
+    }
+
+    private String getTaskIdentifier(TaskEntity task) {
+        if (task.getResourceId() != null && !task.getResourceId().isEmpty()) {
+            return task.getResourceId();
+        }
+        return LocalDate.ofInstant(task.getCreationDate(), ZoneOffset.UTC) + "|" + task.getTitle();
+    }
+
+    private String getTaskIdentifier(BaseTaskDto task) {
+        if (task.getTaskId() != null && !task.getTaskId().isEmpty()) {
+            return task.getTaskId();
+        }
+        return task.getCreationDate() + "|" + task.getTitle();
     }
 
     private void deleteTask(TaskEntity taskEntity) {
@@ -184,6 +203,7 @@ public class TaskDbRepo {
 
     private boolean isTaskEntityToBeUpdated(TaskEntity taskEntity, BaseTaskDto task) {
         return !taskEntity.getTitle().equals(task.getTitle())
+                || !TaskResourceType.getResourceType(taskEntity.getResource()).equals(task.getSource())
                 || !taskEntity.getResourceId().equals(task.getTaskId())
                 || (taskEntity.getCompletionDate() == null && task.getCompleted() != null)
                 || (taskEntity.getDescription() != null
@@ -200,6 +220,7 @@ public class TaskDbRepo {
             taskEntity.setCompletionDate(task.getCompleted().atTime(0, 0)
                     .toInstant(ZoneOffset.UTC));
         }
+        taskEntity.setResource(task.getSource().toString());
         taskEntity.setDescription(task.getDescription());
         taskEntity.setProjectCode(task.getProjectCode());
         taskEntity.setTags(task.getTags());
