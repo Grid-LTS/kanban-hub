@@ -11,7 +11,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group 'com.github.gridlts.kanbanhub'
 
-sourceCompatibility = 1.11
+sourceCompatibility = 1.17
 
 repositories {
     mavenCentral()

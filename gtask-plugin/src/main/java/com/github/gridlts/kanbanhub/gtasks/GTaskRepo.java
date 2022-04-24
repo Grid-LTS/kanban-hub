@@ -6,7 +6,6 @@ import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
@@ -35,7 +34,7 @@ import static com.github.gridlts.kanbanhub.sources.api.TaskResourceType.GOOGLE_T
 @RequiredArgsConstructor
 public class GTaskRepo implements ITaskResourceRepo {
 
-    private static final Long MAX_RESULTS = 10000L;
+    private static final int MAX_RESULTS = 10000;
 
     private Tasks tasksService;
     private final GTasksApiService gTasksApiService;
@@ -73,10 +72,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         try {
             this.tasksService = gTasksApiService.instantiateGapiService(accessToken);
             return this.getTaskLists().stream().map(this::mapTaskListToDto).collect(Collectors.toList());
-        } catch (IOException io) {
-
-        } catch (GeneralSecurityException generalSecurityException) {
-
+        } catch (IOException | GeneralSecurityException io) {
         }
         return new ArrayList<>();
     }
@@ -92,9 +88,7 @@ public class GTaskRepo implements ITaskResourceRepo {
             return this.getOpenTasksForTaskList(taskListId).stream()
                     .map(task -> mapTaskToDto(task, taskListOptional.get()))
                     .collect(Collectors.toList());
-        } catch (IOException io) {
-
-        } catch (GeneralSecurityException generalSecurityException) {
+        } catch (IOException | GeneralSecurityException io) {
 
         }
         return new ArrayList<>();
@@ -154,6 +148,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         return tasksForTaskList;
     }
 
+    @Override
     public List<BaseTaskDto> getAllCompletedTasksNewerThan(ZonedDateTime completedAfterDateTime) {
         List<TaskList> taskLists = this.getTaskLists();
         List<BaseTaskDto> convertedTaskList = new ArrayList<>();
@@ -217,7 +212,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         List<TaskList> taskLists = new ArrayList<>();
         try {
             TaskLists result = this.tasksService.tasklists().list()
-                    .setMaxResults(20L)
+                    .setMaxResults(20)
                     .execute();
             if (result == null) {
                 return taskLists;
@@ -248,12 +243,19 @@ public class GTaskRepo implements ITaskResourceRepo {
     }
 
     private BaseTaskDto mapTaskToDto(Task task, TaskList taskList) {
-        DateTime dateUpdated;
-        if (task.getCompleted() != null &&
-                task.getUpdated().getValue() > task.getCompleted().getValue()) {
-            dateUpdated = task.getCompleted();
+        LocalDate dateUpdated;
+        ZonedDateTime updatedTemp = DateTimeHelper.convertGoogleTimeToZonedDateTime(task.getUpdated());
+        ZonedDateTime completedTemp;
+        if (task.getCompleted() != null) {
+            completedTemp = DateTimeHelper.convertGoogleTimeToZonedDateTime(task.getCompleted());
         } else {
-            dateUpdated = task.getUpdated();
+            completedTemp = null;
+        }
+        if (completedTemp != null &&
+                updatedTemp.isAfter(completedTemp)) {
+            dateUpdated = completedTemp.toLocalDate();
+        } else {
+            dateUpdated = updatedTemp.toLocalDate();
         }
         LocalDate completedDate;
         TaskStatus status;
@@ -261,7 +263,7 @@ public class GTaskRepo implements ITaskResourceRepo {
             completedDate = null;
             status = TaskStatus.PENDING;
         } else {
-            completedDate = DateTimeHelper.convertGoogleTimeToDate(task.getCompleted());
+            completedDate = completedTemp.toLocalDate();
             status = TaskStatus.COMPLETED;
         }
         return new BaseTaskDto.Builder()
@@ -269,7 +271,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .title(task.getTitle())
                 .description(task.getNotes())
                 .status(status)
-                .creationDate(DateTimeHelper.convertGoogleTimeToDate(dateUpdated))
+                .creationDate(dateUpdated)
                 .completed(completedDate)
                 .source(GOOGLE_TASKS)
                 .addTags(taskList.getTitle())
