@@ -32,7 +32,10 @@ public class TaskDbRepo {
 
     private TaskRepository taskRepository;
     private LastUpdatedRepository lastUpdatedRepository;
-    private Map<String, ITaskResourceRepo> repos;
+
+
+
+    private Map<TaskResourceType, ITaskResourceRepo> repos;
 
     @Autowired
     public TaskDbRepo(List<ITaskResourceRepo> repos, TaskRepository taskRepository,
@@ -46,13 +49,13 @@ public class TaskDbRepo {
     }
 
     public void saveAllRecentTasksConsole() {
-        for (Map.Entry<String, ITaskResourceRepo> source : repos.entrySet()) {
+        for (Map.Entry<TaskResourceType, ITaskResourceRepo> source : repos.entrySet()) {
             source.getValue().initConsole();
             this.saveAllRecentTasksForType(source.getKey());
         }
     }
 
-    public void saveAllTasksAuthentified(String resourceType, String range, String accessToken) {
+    public void saveAllTasksAuthentified(TaskResourceType resourceType, String range, String accessToken) {
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         resourceRepo.init(accessToken);
         if (TIME_RANGE_RECENT.equals(range)) {
@@ -63,7 +66,7 @@ public class TaskDbRepo {
         }
     }
 
-    public void saveAllRecentTasksForType(String resourceType) {
+    public void saveAllRecentTasksForType(TaskResourceType resourceType) {
         boolean tasksSaved;
         Optional<ZonedDateTime> lastUpdatedTime = getLastUpdatedTime(resourceType);
         if (lastUpdatedTime.isEmpty()) {
@@ -77,14 +80,14 @@ public class TaskDbRepo {
         updateTimestamp(resourceType);
     }
 
-    public boolean addRecentTasksForType(String resourceType, ZonedDateTime lastSavedTime) {
+    public boolean addRecentTasksForType(TaskResourceType resourceType, ZonedDateTime lastSavedTime) {
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> recentTasks = resourceRepo.getAllTasksNewerThan(lastSavedTime);
         persistTasks(recentTasks, resourceType, new ArrayList<>());
         return recentTasks.size() > 0;
     }
 
-    public Boolean syncAllTasksInitial(String resourceType) {
+    public Boolean syncAllTasksInitial(TaskResourceType resourceType) {
         ZonedDateTime startDateTime = DateUtilities.getOldEnoughDate();
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> initialTaskList = resourceRepo.getAllTasksNewerThan(startDateTime);
@@ -100,12 +103,12 @@ public class TaskDbRepo {
         return initialTaskList.size() > 0;
     }
 
-    public void deleteTasksDeletedUpstream(String resourceType, ZonedDateTime startDateTime) {
+    public void deleteTasksDeletedUpstream(TaskResourceType resourceType, ZonedDateTime startDateTime) {
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> deletedTasks = resourceRepo.getDeletedTasks(startDateTime);
         for (BaseTaskDto deletedTask : deletedTasks) {
             Optional<TaskEntity> deletedTaskEntityOptional = taskRepository
-                    .findDistinctByResourceAndResourceId(resourceType,
+                    .findDistinctByResourceAndResourceId(resourceType.toString(),
                     deletedTask.getTaskId());
             deletedTaskEntityOptional.ifPresent(this::deleteTask);
         }
@@ -120,35 +123,39 @@ public class TaskDbRepo {
                 .collect(Collectors.toList());
     }
 
+    public Map<TaskResourceType, ITaskResourceRepo> getRepos() {
+        return repos;
+    }
+
     private List<TaskEntity> getAllTasksUpdatedAfter(TaskResourceType resourceType,
                                                     TaskStatus status, Instant lowerTimeLimit) {
         return taskRepository.findAllByResourceAndStatusAndUpdateTimeAfter(
                 resourceType.toString(), status, lowerTimeLimit);
     }
 
-    private ITaskResourceRepo getRepoForResourceType(String resourceType) {
+    private ITaskResourceRepo getRepoForResourceType(TaskResourceType resourceType) {
         ITaskResourceRepo resourceRepo = repos.get(resourceType);
         if (resourceRepo == null) {
-            throw new ResourceNotFoundException(resourceType);
+            throw new ResourceNotFoundException(resourceType.toString());
         }
         return resourceRepo;
     }
 
-    private Optional<ZonedDateTime> getLastUpdatedTime(String resourceType) {
-        return lastUpdatedRepository.findOneByResource(resourceType).map
+    private Optional<ZonedDateTime> getLastUpdatedTime(TaskResourceType resourceType) {
+        return lastUpdatedRepository.findOneByResource(resourceType.toString()).map
                 (lastUpdated -> lastUpdated.getLastUpdated().atZone(ZoneId.of("UTC")));
     }
 
-    private void updateTimestamp(String resourceType) {
+    private void updateTimestamp(TaskResourceType resourceType) {
         LastUpdatedEntity lastUpdatedTimestamp = lastUpdatedRepository
-                .findOneByResource(resourceType).orElse(new LastUpdatedEntity());
-        lastUpdatedTimestamp.setResource(resourceType);
+                .findOneByResource(resourceType.toString()).orElse(new LastUpdatedEntity());
+        lastUpdatedTimestamp.setResource(resourceType.toString());
         lastUpdatedTimestamp.setLastUpdated(LocalDateTime.now(ZoneId.of("UTC")));
         lastUpdatedRepository.save(lastUpdatedTimestamp);
     }
 
-    private void persistTasks(List<BaseTaskDto> tasks, String resourceType, List<TaskEntity> leftOver) {
-        List<TaskEntity> existingTaskEntities = taskRepository.findAllByResource(resourceType);
+    private void persistTasks(List<BaseTaskDto> tasks, TaskResourceType resourceType, List<TaskEntity> leftOver) {
+        List<TaskEntity> existingTaskEntities = taskRepository.findAllByResource(resourceType.toString());
         Map<String, TaskEntity> existingTaskEntitiesByTitleAndDate = new HashMap<>();
         // use creation date + task title as identifier because some task managers do not define a
         // native id for their tasks

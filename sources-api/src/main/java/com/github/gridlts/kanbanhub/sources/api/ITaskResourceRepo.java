@@ -23,7 +23,7 @@ public interface ITaskResourceRepo {
 
     void initConsole();
 
-    String getResourceType();
+    TaskResourceType getResourceType();
 
     ITaskResourceConfiguration getResourceConfiguration();
 

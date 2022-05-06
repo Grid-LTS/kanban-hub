@@ -1,5 +1,6 @@
 package com.github.gridlts.kanbanhub.todotxt.dto;
 
+import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import org.immutables.value.Value;
 import org.springframework.lang.Nullable;
 
@@ -30,7 +31,7 @@ public abstract class TodoTxtDto {
     @Nullable
     public abstract String project();
 
-    public abstract String status();
+    public abstract TaskStatus status();
 
     public abstract List<String> tags();
 

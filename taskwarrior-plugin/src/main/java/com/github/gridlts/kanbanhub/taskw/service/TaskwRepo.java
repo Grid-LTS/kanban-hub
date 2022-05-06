@@ -3,6 +3,7 @@ package com.github.gridlts.kanbanhub.taskw.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceConfiguration;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
+import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
@@ -45,8 +46,8 @@ public class TaskwRepo implements ITaskResourceRepo {
     }
 
     @Override
-    public String getResourceType() {
-        return "taskwarrior";
+    public TaskResourceType getResourceType() {
+        return TASKWARRIOR;
     }
 
     @Override
