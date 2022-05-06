@@ -44,8 +44,9 @@ public class TaskCsvExport {
     }
 
     public void exportAllCompletedTasks() throws CsvRequiredFieldEmptyException, IOException, CsvDataTypeMismatchException {
-        exportAllCompletedTasksForType(TaskResourceType.GOOGLE_TASKS);
-        exportAllCompletedTasksForType(TaskResourceType.TASKWARRIOR);
+        for (TaskResourceType resource : taskDbRepo.getRepos().keySet()){
+            exportAllCompletedTasksForType(resource);
+        }
     }
 
     public void exportAllCompletedTasksForType(TaskResourceType resourceType) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {

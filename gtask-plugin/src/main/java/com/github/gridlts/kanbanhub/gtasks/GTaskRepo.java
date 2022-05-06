@@ -3,6 +3,7 @@ package com.github.gridlts.kanbanhub.gtasks;
 import com.github.gridlts.kanbanhub.gtasks.service.GTasksApiService;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceConfiguration;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
+import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.TaskStatus;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
@@ -58,8 +59,8 @@ public class GTaskRepo implements ITaskResourceRepo {
     }
 
     @Override
-    public String getResourceType() {
-        return "google_tasks";
+    public TaskResourceType getResourceType() {
+        return GOOGLE_TASKS;
     }
 
     @Override

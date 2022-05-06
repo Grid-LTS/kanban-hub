@@ -13,6 +13,9 @@ public class TodoTxtConfig {
     @Value("${todotxt.done.filename:done.txt}")
     private String doneFileName;
 
+    @Value("${todotxt.pending.filename:todo.txt}")
+    private String pendingFileName;
+
     @Value("${store.path}")
     private String storeDirectoryPath;
 }

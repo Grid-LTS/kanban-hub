@@ -34,3 +34,4 @@ task copyConfig(type: Copy) {
 }
 
 tasks.build.finalizedBy(copyConfig)
+tasks.bootJar.finalizedBy(copyConfig)

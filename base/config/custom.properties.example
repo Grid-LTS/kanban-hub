@@ -5,6 +5,9 @@ gtasks:
 
 gtasks.url.root=https://www.googleapis.com/
 
+todotxt.done.filename=done.txt
+todotxt.pending.filename=todo.txt
+
 pocket.consumer_key=
 
 store.path=<dir where files go>
