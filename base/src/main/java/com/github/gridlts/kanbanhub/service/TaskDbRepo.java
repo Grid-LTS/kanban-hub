@@ -20,6 +20,8 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.gridlts.kanbanhub.helper.DateUtilities.DATE_PATTERN;
+
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Slf4j
@@ -102,7 +104,8 @@ public class TaskDbRepo {
         ITaskResourceRepo resourceRepo = getRepoForResourceType(resourceType);
         List<BaseTaskDto> deletedTasks = resourceRepo.getDeletedTasks(startDateTime);
         for (BaseTaskDto deletedTask : deletedTasks) {
-            Optional<TaskEntity> deletedTaskEntityOptional = taskRepository.findDistinctByResourceAndResourceId(resourceType,
+            Optional<TaskEntity> deletedTaskEntityOptional = taskRepository
+                    .findDistinctByResourceAndResourceId(resourceType,
                     deletedTask.getTaskId());
             deletedTaskEntityOptional.ifPresent(this::deleteTask);
         }
@@ -110,8 +113,11 @@ public class TaskDbRepo {
 
     public List<BaseTaskDto> getAllTasksCompletedAfter(TaskResourceType resourceType, Instant lowerTimeLimit) {
         return getAllTasksUpdatedAfter(resourceType, TaskStatus.COMPLETED, lowerTimeLimit)
-                .stream().filter(taskEntity -> !taskEntity.getCompletionDate().isBefore(lowerTimeLimit))
-                .map(this::convertTaskToNewModel).collect(Collectors.toList());
+                .stream()
+                .filter(taskEntity ->
+                        !taskEntity.getCompletionDate().isBefore(lowerTimeLimit))
+                .map(this::convertTaskToNewModel)
+                .collect(Collectors.toList());
     }
 
     private List<TaskEntity> getAllTasksUpdatedAfter(TaskResourceType resourceType,
@@ -181,7 +187,7 @@ public class TaskDbRepo {
         if (task.getTaskId() != null && !task.getTaskId().isEmpty()) {
             return task.getTaskId();
         }
-        return task.getCreationDate() + "|" + task.getTitle();
+        return task.getCreationDate().format(DATE_PATTERN) + "|" + task.getTitle();
     }
 
     private void deleteTask(TaskEntity taskEntity) {

@@ -8,7 +8,8 @@ import java.time.format.DateTimeFormatter;
  */
 public class DateUtilities {
 
-    final static String RFC_3339_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static final String RFC_3339_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static ZonedDateTime convertUnixTimestampToZonedDateTime(Long unixTime) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(unixTime), ZoneId.of("UTC"));
@@ -16,8 +17,14 @@ public class DateUtilities {
 
     public static ZonedDateTime getOldEnoughDate() {
         String date = "1990-01-01";
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, f);
+        LocalDate localDate = LocalDate.parse(date, DATE_PATTERN);
         return localDate.atStartOfDay(ZoneId.of("UTC"));
     }
+
+    public static LocalDate convert(String s) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(s, formatter);
+    }
+
+
 }

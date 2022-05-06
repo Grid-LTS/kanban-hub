@@ -13,4 +13,7 @@ cd gtask-plugin
 
 cd taskwarrior-plugin
 ../gradlew publishToMavenLocal
+
+cd todotxt-plugin
+../gradlew publishToMavenLocal
 ```

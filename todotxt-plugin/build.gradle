@@ -1,0 +1,52 @@
+import org.gradle.api.publish.maven.MavenPublication
+
+plugins {
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply from: "${rootDir.getParent()}/gradle-plugins/dependencies.gradle"
+
+group 'com.github.gridlts.kanbanhub'
+
+sourceCompatibility = 1.17
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    implementation "org.springframework.boot:spring-boot:${springBootVersion}"
+    implementation "com.github.gridlts.kanbanhub:sources-api:${khSourcesApiVersion}"
+    annotationProcessor   "org.immutables:value:${orgImmutablesVersion}"
+    compileOnly  "org.immutables:builder:${orgImmutablesVersion}"
+    compileOnly "org.immutables:gson:${orgImmutablesVersion}"
+    compileOnly  "org.immutables:value:${orgImmutablesVersion}:annotations"
+    compileOnly  "org.immutables:annotate:${orgImmutablesVersion}"
+    compileOnly supportDependencies.projectLombok
+    annotationProcessor supportDependencies.projectLombok
+    testAnnotationProcessor supportDependencies.projectLombok
+    testCompileOnly supportDependencies.projectLombok
+}
+
+sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId =  'com.github.gridlts.kanbanhub'
+            artifactId = 'todotxt-plugin'
+            version = '0.0.1-SNAPSHOT'
+            from components.java
+        }
+    }
+}
