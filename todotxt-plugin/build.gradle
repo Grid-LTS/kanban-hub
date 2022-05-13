@@ -12,8 +12,6 @@ apply from: "${rootDir.getParent()}/gradle-plugins/dependencies.gradle"
 
 group 'com.github.gridlts.kanbanhub'
 
-sourceCompatibility = 1.17
-
 repositories {
     mavenCentral()
     mavenLocal()

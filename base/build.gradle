@@ -9,7 +9,7 @@ apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 group 'com.github.gridlts'
 
-sourceCompatibility = 1.17
+sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -55,3 +55,4 @@ task copyConfig(type: Copy) {
     }
     into "${project.buildDir}/libs"
 }
+targetCompatibility = JavaVersion.VERSION_17

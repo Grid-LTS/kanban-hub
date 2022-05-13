@@ -17,7 +17,7 @@ bootRun {
 
 group 'com.github.gridlts'
 
-sourceCompatibility = 1.17
+sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -51,3 +51,4 @@ task copyConfig(type: Copy) {
 
 tasks.jar.finalizedBy(copyConfig)
 tasks.bootJar.finalizedBy(copyConfig)
+targetCompatibility = JavaVersion.VERSION_17
