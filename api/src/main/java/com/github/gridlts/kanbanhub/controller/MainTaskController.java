@@ -3,6 +3,7 @@ package com.github.gridlts.kanbanhub.controller;
 import com.github.gridlts.kanbanhub.exception.ResourceNotFoundException;
 import com.github.gridlts.kanbanhub.service.TaskDbRepo;
 import com.github.gridlts.kanbanhub.sources.api.ITaskResourceRepo;
+import com.github.gridlts.kanbanhub.sources.api.TaskResourceType;
 import com.github.gridlts.kanbanhub.sources.api.dto.BaseTaskDto;
 import com.github.gridlts.kanbanhub.sources.api.dto.TaskListDto;
 import org.apache.commons.collections4.map.HashedMap;
@@ -19,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class MainTaskController {
 
     private TaskDbRepo taskRepo;
-    private Map<String, ITaskResourceRepo> repos;
+    private Map<TaskResourceType, ITaskResourceRepo> repos;
 
     @Autowired
     MainTaskController(TaskDbRepo taskRepo, List<ITaskResourceRepo> repos) {
@@ -32,7 +33,7 @@ public class MainTaskController {
 
     @RequestMapping(value = "/{resource}/save", method = RequestMethod.POST)
     public void saveAllTasks(@RequestHeader(name = "Authorization") String accessToken,
-                             @PathVariable String resource,
+                             @PathVariable TaskResourceType resource,
                              @RequestParam(value="range", defaultValue = TIME_RANGE_RECENT) String range) {
         taskRepo.saveAllTasksAuthentified(resource, range, accessToken);
     }
