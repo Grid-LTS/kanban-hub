@@ -7,8 +7,17 @@ apply plugin: 'io.spring.dependency-management'
 apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 
 
-springBoot {
-    mainClass = 'com.github.gridlts.khapi.KhapiApplication'
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.github.gridlts.kanbanhub.KhapiApplication'
+        )
+    }
+}
+
+jar {
+    // do not generate *-plain jar
+    enabled = false
 }
 
 bootRun {
@@ -49,6 +58,7 @@ task copyConfig(type: Copy) {
     into "${project.buildDir}/libs"
 }
 
+tasks.build.finalizedBy(copyConfig)
 tasks.jar.finalizedBy(copyConfig)
 tasks.bootJar.finalizedBy(copyConfig)
 targetCompatibility = JavaVersion.VERSION_17

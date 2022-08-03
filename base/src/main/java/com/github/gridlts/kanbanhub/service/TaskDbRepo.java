@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.gridlts.kanbanhub.helper.DateUtilities.DATE_PATTERN;
+import static java.time.ZoneOffset.UTC;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -118,7 +119,7 @@ public class TaskDbRepo {
         return getAllTasksUpdatedAfter(resourceType, TaskStatus.COMPLETED, lowerTimeLimit)
                 .stream()
                 .filter(taskEntity ->
-                        !taskEntity.getCompletionDate().isBefore(lowerTimeLimit))
+                        !taskEntity.getCompletionDate().isBefore(lowerTimeLimit.atZone(UTC).toLocalDate()))
                 .map(this::convertTaskToNewModel)
                 .collect(Collectors.toList());
     }
@@ -187,7 +188,7 @@ public class TaskDbRepo {
         if (task.getResourceId() != null && !task.getResourceId().isEmpty()) {
             return task.getResourceId();
         }
-        return LocalDate.ofInstant(task.getCreationDate(), ZoneOffset.UTC) + "|" + task.getTitle();
+        return task.getCreationDate() + "|" + task.getTitle();
     }
 
     private String getTaskIdentifier(BaseTaskDto task) {
@@ -208,8 +209,7 @@ public class TaskDbRepo {
     private TaskEntity convertTaskToNewModel(BaseTaskDto task) {
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTaskId(UUID.randomUUID().toString());
-        taskEntity.setCreationDate(task.getCreationDate().atTime(0, 0)
-                .toInstant(ZoneOffset.UTC));
+        taskEntity.setCreationDate(task.getCreationDate());
         taskEntity.setResource(task.getSource().toString());
         return updateTaskEntityWithTaskDto(task, taskEntity);
     }
@@ -230,8 +230,7 @@ public class TaskDbRepo {
         taskEntity.setTitle(task.getTitle());
         taskEntity.setResourceId(task.getTaskId());
         if (task.getCompleted() != null) {
-            taskEntity.setCompletionDate(task.getCompleted().atTime(0, 0)
-                    .toInstant(ZoneOffset.UTC));
+            taskEntity.setCompletionDate(task.getCompleted());
         }
         taskEntity.setResource(task.getSource().toString());
         taskEntity.setDescription(task.getDescription());
@@ -245,9 +244,8 @@ public class TaskDbRepo {
         return new BaseTaskDto.Builder()
                 .taskId(taskEntity.getResourceId())
                 .title(taskEntity.getTitle())
-                .creationDate(LocalDate.ofInstant(taskEntity.getCreationDate(), ZoneOffset.UTC))
-                .completed(taskEntity.getCompletionDate() != null ? LocalDate.ofInstant(taskEntity.getCompletionDate(),
-                        ZoneOffset.UTC) : null)
+                .creationDate(taskEntity.getCreationDate())
+                .completed(taskEntity.getCompletionDate() != null ? taskEntity.getCompletionDate() : null)
                 .description(taskEntity.getDescription())
                 .status(taskEntity.getStatus())
                 .projectCode(taskEntity.getProjectCode())

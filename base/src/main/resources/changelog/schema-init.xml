@@ -15,23 +15,23 @@
             <column name="resource_id" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="insert_ts" type="timestamp">
+            <column name="insert_ts" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="update_ts" type="timestamp" defaultValueDate="2000-01-01 00:00:00">
+            <column name="update_ts" type="text" defaultValueDate="2000-01-01 00:00:00">
                 <constraints nullable="false"/>
             </column>
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="TEXT"/>
-            <column name="status" type="varchar(16)">
+            <column name="status" type="varchar(16)" defaultValue="PENDING">
                 <constraints nullable="false"/>
             </column>
-            <column name="creation_date" type="varchar(32)">
+            <column name="creation_date" type="text">
                 <constraints nullable="false" />
             </column>
-            <column name="completion_date" type="date"/>
+            <column name="completion_date" type="text"/>
             <column name="resource" type="varchar(32)" >
                 <constraints nullable="false"/>
             </column>
@@ -42,7 +42,7 @@
             <column name="resource" type="varchar(32)">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="last_updated_time" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+            <column name="last_updated_time" type="text" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>

@@ -23,7 +23,8 @@ dependencies {
     implementation supportDependencies.apacheCommons
     implementation supportDependencies.jacksonDataBind
     implementation supportDependencies.jackson
-    runtimeOnly supportDependencies.hsqlDb
+    implementation supportDependencies.sqlite
+    implementation supportDependencies.sqliteDialect
     implementation supportDependencies.liquibase
     implementation supportDependencies.findBugsJsr
     api "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
