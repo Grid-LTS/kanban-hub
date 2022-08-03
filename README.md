@@ -17,3 +17,8 @@ cd taskwarrior-plugin
 cd todotxt-plugin
 ../gradlew publishToMavenLocal
 ```
+
+```
+cd console
+../gradlew clean bootJar
+```

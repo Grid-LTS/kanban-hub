@@ -11,6 +11,8 @@ ext {
     logbackVersion = "1.2.3"
     lombokVersion = "1.18.20"
     liquibaseVersion = "3.8.9"
+    sqliteVersion = "3.25.2"
+    sqliteDialectVersion =  "0.1.2"
 
 
 supportDependencies = [
@@ -39,6 +41,8 @@ supportDependencies = [
         orgImmutablesGson               : "org.immutables:gson:${orgImmutablesVersion}",
         orgImmutablesAnnotate           : "org.immutables:annotate:${orgImmutablesVersion}",
         openCSV                         : "com.opencsv:opencsv:${openCSVVersion}",
-        projectLombok                   : "org.projectlombok:lombok:${lombokVersion}"
+        projectLombok                   : "org.projectlombok:lombok:${lombokVersion}",
+        sqlite                          : "org.xerial:sqlite-jdbc:${sqliteVersion}",
+        sqliteDialect                   : "com.github.gwenn:sqlite-dialect:${sqliteDialectVersion}"
 ]
 }

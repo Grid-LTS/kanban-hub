@@ -2,10 +2,7 @@ package com.github.gridlts.kanbanhub.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,6 +14,6 @@ public class LastUpdatedEntity {
     @Column(nullable=false, columnDefinition = "varchar(32)")
     private String resource;
 
-    @Column(name = "last_updated_time", nullable=false, columnDefinition = "timestamp")
+    @Column(name = "last_updated_time", nullable=false, columnDefinition = "text")
     LocalDateTime lastUpdated;
 }
