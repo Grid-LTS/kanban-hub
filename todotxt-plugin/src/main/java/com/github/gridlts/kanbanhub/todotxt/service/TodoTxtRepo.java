@@ -258,7 +258,7 @@ public class TodoTxtRepo implements ITaskResourceRepo {
                 .status(todoTxtTask.status())
                 .creationDate(todoTxtTask.entry().toLocalDate())
                 .completed(completedDate)
-                .source(TODOTXT)
+                .resource(TODOTXT)
                 .addAllTags(todoTxtTask.tags())
                 .projectCode(todoTxtTask.project())
                 .build();

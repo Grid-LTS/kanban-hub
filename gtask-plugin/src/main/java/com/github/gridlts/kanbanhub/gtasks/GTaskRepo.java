@@ -274,7 +274,7 @@ public class GTaskRepo implements ITaskResourceRepo {
                 .status(status)
                 .creationDate(dateUpdated)
                 .completed(completedDate)
-                .source(GOOGLE_TASKS)
+                .resource(GOOGLE_TASKS)
                 .addTags(taskList.getTitle())
                 .build();
     }
