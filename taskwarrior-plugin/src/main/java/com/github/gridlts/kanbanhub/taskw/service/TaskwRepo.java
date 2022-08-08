@@ -159,7 +159,7 @@ public class TaskwRepo implements ITaskResourceRepo {
                 .status(status)
                 .creationDate(taskwTask.entry().toLocalDate())
                 .completed(completedDate)
-                .source(TASKWARRIOR)
+                .resource(TASKWARRIOR)
                 .addAllTags(taskwTask.tags())
                 .projectCode(taskwTask.project())
                 .build();

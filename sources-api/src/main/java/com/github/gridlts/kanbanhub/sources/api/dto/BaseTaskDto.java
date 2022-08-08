@@ -13,7 +13,7 @@ import java.util.List;
         builderVisibility = Value.Style.BuilderVisibility.PACKAGE)
 public abstract class BaseTaskDto {
 
-    @InjectCsvBindByNameAnnotation
+    @InjectCsvBindByNameAnnotation(column="task_id")
     public abstract String getTaskId();
 
     @InjectCsvBindByNameAnnotation
@@ -25,17 +25,17 @@ public abstract class BaseTaskDto {
 
     public abstract TaskStatus getStatus();
 
-    @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
+    @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class, column="creation_date")
     public abstract LocalDate getCreationDate();
 
-    @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class)
+    @InjectCsvCustomBindByNameAnnotation(converter = LocalDateConverter.class, column="completion_date")
     @Nullable
     public abstract LocalDate getCompleted();
 
     @InjectCsvBindByNameAnnotation
-    public abstract TaskResourceType getSource();
+    public abstract TaskResourceType getResource();
 
-    @InjectCsvBindByNameAnnotation
+    @InjectCsvBindByNameAnnotation(column="project_code")
     @Nullable
     public abstract String getProjectCode();
 

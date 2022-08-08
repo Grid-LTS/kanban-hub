@@ -210,13 +210,13 @@ public class TaskDbRepo {
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTaskId(UUID.randomUUID().toString());
         taskEntity.setCreationDate(task.getCreationDate());
-        taskEntity.setResource(task.getSource().toString());
+        taskEntity.setResource(task.getResource().toString());
         return updateTaskEntityWithTaskDto(task, taskEntity);
     }
 
     private boolean isTaskEntityToBeUpdated(TaskEntity taskEntity, BaseTaskDto task) {
         return !taskEntity.getTitle().equals(task.getTitle())
-                || !TaskResourceType.getResourceType(taskEntity.getResource()).equals(task.getSource())
+                || !TaskResourceType.getResourceType(taskEntity.getResource()).equals(task.getResource())
                 || !taskEntity.getResourceId().equals(task.getTaskId())
                 || (taskEntity.getCompletionDate() == null && task.getCompleted() != null)
                 || (taskEntity.getDescription() != null
@@ -232,7 +232,7 @@ public class TaskDbRepo {
         if (task.getCompleted() != null) {
             taskEntity.setCompletionDate(task.getCompleted());
         }
-        taskEntity.setResource(task.getSource().toString());
+        taskEntity.setResource(task.getResource().toString());
         taskEntity.setDescription(task.getDescription());
         taskEntity.setProjectCode(task.getProjectCode());
         taskEntity.setTags(task.getTags());
@@ -249,7 +249,7 @@ public class TaskDbRepo {
                 .description(taskEntity.getDescription())
                 .status(taskEntity.getStatus())
                 .projectCode(taskEntity.getProjectCode())
-                .source(TaskResourceType.getResourceType(taskEntity.getResource()))
+                .resource(TaskResourceType.getResourceType(taskEntity.getResource()))
                 .addAllTags(taskEntity.getTags())
                 .projectCode(taskEntity.getProjectCode())
                 .build();
