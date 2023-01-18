@@ -137,7 +137,9 @@ public class TodoTxtRepo implements ITaskResourceRepo {
                     break;
                 }
                 TodoTxtDto todoTxtDto = mapTodoTxtDto(line);
-                if (todoTxtDto.modified().isAfter(newerThanDateTime)) {
+                newerThanDateTime = newerThanDateTime.toLocalDate().atStartOfDay(ZoneId.of("UTC"));
+                if (todoTxtDto.modified().isAfter(newerThanDateTime)
+                    || todoTxtDto.modified().isEqual(newerThanDateTime)) {
                     completedTodoTxt.add(todoTxtDto);
                 }
 
