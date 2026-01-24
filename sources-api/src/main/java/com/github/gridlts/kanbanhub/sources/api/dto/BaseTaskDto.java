@@ -42,7 +42,7 @@ public abstract class BaseTaskDto {
     @InjectCsvBindAndSplitByNameAnnotation(elementType = String.class)
     public abstract List<String> getTags();
 
-    public static class Builder extends ImmutableBaseTaskDto.Builder {
+    public static class Builder extends com.github.gridlts.kanbanhub.sources.api.dto.ImmutableBaseTaskDto.Builder {
     }
 
 }

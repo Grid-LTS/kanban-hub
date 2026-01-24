@@ -1,6 +1,7 @@
 package com.github.gridlts.kanbanhub.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.sqlite.SQLiteConfig;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.TimeZone;

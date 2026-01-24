@@ -11,7 +11,7 @@ public abstract class TaskListDto {
 
     public abstract String getTitle();
 
-    public static class Builder extends ImmutableTaskListDto.Builder {
+    public static class Builder extends com.github.gridlts.kanbanhub.sources.api.dto.ImmutableTaskListDto.Builder {
     }
 
 }

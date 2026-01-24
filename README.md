@@ -6,19 +6,17 @@ Wraps different task management software and unifies them in one app.
 
 ```
 cd sources-api
-../gradlew publishToMavenLocal
-
+../gradlew clean publishToMavenLocal
+cd ..
 cd gtask-plugin
-../gradlew publishToMavenLocal
-
+../gradlew clean publishToMavenLocal
+cd ..
 cd taskwarrior-plugin
-../gradlew publishToMavenLocal
-
+../gradlew clean publishToMavenLocal
+cd ..
 cd todotxt-plugin
-../gradlew publishToMavenLocal
-```
-
-```
+../gradlew clean publishToMavenLocal
+cd ..
 cd console
 ../gradlew clean bootJar
 ```

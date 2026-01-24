@@ -1,10 +1,8 @@
-import org.gradle.api.publish.maven.MavenPublication
-
 plugins {
-    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id 'org.springframework.boot' version '3.5.10'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -34,7 +32,16 @@ dependencies {
     //}
 }
 
-sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+sourceSets {
+    main {
+        java {
+            srcDirs = [
+                    'src/main/java',
+                    "$buildDir/generated/sources/annotationProcessor/java/main"
+            ]
+        }
+    }
+}
 
 publishing {
     publications {

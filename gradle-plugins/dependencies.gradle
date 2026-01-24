@@ -2,14 +2,12 @@ ext {
     apacheCommonsVersion = "3.10"
     findbugsJsrVersion = "3.0.2"
     springBootVersion = "${springBootVersion}"
-    springSecurityOauthVersion = "${springBootVersion}"
-    orgImmutablesVersion = "2.9.0"
+    orgImmutablesVersion = "2.12.1"
     openCSVVersion = "4.6"
-    springVersion = "${springVersion}"
     hsqldbVersion = "2.5.0"
     jacksonVersion = "2.13.2"
     logbackVersion = "1.2.3"
-    lombokVersion = "1.18.20"
+    lombokVersion = "1.18.30"
     liquibaseVersion = "3.8.9"
     sqliteVersion = "3.25.2"
     sqliteDialectVersion =  "0.1.2"
@@ -20,7 +18,7 @@ supportDependencies = [
         findBugsJsr : "com.google.code.findbugs:jsr305:${findbugsJsrVersion}",
         jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
         jackson : "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
-        springContext : "org.springframework:spring-context:${springVersion}",
+        springContext : "org.springframework:spring-context",
         springBoot: "org.springframework.boot:spring-boot:${springBootVersion}",
         springBootParent : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
         springBootAutoConfigure : "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}",
@@ -31,12 +29,13 @@ supportDependencies = [
         springBootStarterJpa            : "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
         springBootStarterSecurity       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         springBootStarterActuator       : "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
-        springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2:${springSecurityOauthVersion}",
+        springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2",
         hsqlDb                          : "org.hsqldb:hsqldb:${hsqldbVersion}",
         liquibase                       : "org.liquibase:liquibase-core:${liquibaseVersion}",
         logback                         : "ch.qos.logback:logback-classic:${logbackVersion}",
         orgImmutables                   : "org.immutables:value:${orgImmutablesVersion}",
-        orgImmutablesAnnotations        : "org.immutables:value:${orgImmutablesVersion}:annotations",
+        orgImmutablesAnnotationProcessor: "org.immutables:value-processor:${orgImmutablesVersion}",
+        orgImmutablesAnnotations        : "org.immutables:value-annotations:${orgImmutablesVersion}",
         orgImmutablesBuilder            : "org.immutables:builder:${orgImmutablesVersion}",
         orgImmutablesGson               : "org.immutables:gson:${orgImmutablesVersion}",
         orgImmutablesAnnotate           : "org.immutables:annotate:${orgImmutablesVersion}",

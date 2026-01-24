@@ -9,6 +9,11 @@ apply from: rootProject.file('gradle-plugins/dependencies.gradle')
 group 'com.github.gridlts.kanbanhub'
 version  '0.0.1-SNAPSHOT'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 
 repositories {
     mavenLocal()
@@ -21,20 +26,34 @@ dependencies {
     implementation supportDependencies.openCSV
     implementation supportDependencies.findBugsJsr
     annotationProcessor supportDependencies.orgImmutables
+    //annotationProcessor supportDependencies.orgImmutablesAnnotationProcessor
+    annotationProcessor supportDependencies.projectLombok
+    compileOnly supportDependencies.orgImmutables
     compileOnly supportDependencies.orgImmutablesBuilder
     compileOnly supportDependencies.orgImmutablesGson
     compileOnly supportDependencies.orgImmutablesAnnotations
     compileOnly supportDependencies.orgImmutablesAnnotate
     compileOnly supportDependencies.projectLombok
     testCompileOnly supportDependencies.projectLombok
-    annotationProcessor supportDependencies.projectLombok
     testAnnotationProcessor supportDependencies.projectLombok
     testImplementation(supportDependencies.springBootStarterTest) {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 }
 
-sourceSets.main.java.srcDirs = ['build/generated','src/main/java']
+
+sourceSets {
+    main {
+        java {
+            srcDirs = [
+                    'src/main/java',
+                    "$buildDir/generated/sources/annotationProcessor/java/main"
+            ]
+        }
+    }
+}
+
+
 
 publishing {
     publications {
