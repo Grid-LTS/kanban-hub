@@ -1,22 +1,23 @@
 ext {
-    apacheCommonsVersion = "3.10"
+    apacheCommonsVersion = "3.20.0"
     findbugsJsrVersion = "3.0.2"
     springBootVersion = "${springBootVersion}"
     orgImmutablesVersion = "2.12.1"
-    openCSVVersion = "4.6"
-    hsqldbVersion = "2.5.0"
-    jacksonVersion = "2.13.2"
+    openCSVVersion = "5.12.0"
+    hsqldbVersion = "2.7.4"
+    jacksonVersion = "2.21"
+    jacksonDataBindVersion = "2.21.0"
     logbackVersion = "1.2.3"
-    lombokVersion = "1.18.30"
-    liquibaseVersion = "3.8.9"
-    sqliteVersion = "3.25.2"
-    sqliteDialectVersion =  "0.1.2"
+    lombokVersion = "1.18.42"
+    liquibaseVersion = "5.0.1"
+    sqliteVersion = "3.51.1.0"
+    sqliteDialectVersion =  "0.2.0"
 
 
 supportDependencies = [
         apacheCommons : "org.apache.commons:commons-lang3:${apacheCommonsVersion}",
         findBugsJsr : "com.google.code.findbugs:jsr305:${findbugsJsrVersion}",
-        jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+        jacksonDataBind : "com.fasterxml.jackson.core:jackson-databind:${jacksonDataBindVersion}",
         jackson : "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
         springContext : "org.springframework:spring-context",
         springBoot: "org.springframework.boot:spring-boot:${springBootVersion}",
