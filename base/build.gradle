@@ -25,9 +25,11 @@ dependencies {
     implementation supportDependencies.jacksonDataBind
     implementation supportDependencies.jackson
     implementation supportDependencies.sqlite
-    implementation supportDependencies.sqliteDialect
+    implementation supportDependencies.hibernateCommunityDialects
     implementation supportDependencies.liquibase
     implementation supportDependencies.findBugsJsr
+    implementation("org.hibernate.orm:hibernate-core:6.5.0.Final")
+
     api "com.github.gridlts.kanbanhub:gtask-plugin:0.0.1-SNAPSHOT"
     api "com.github.gridlts.kanbanhub:taskwarrior-plugin:0.0.1-SNAPSHOT"
     api "com.github.gridlts.kanbanhub:todotxt-plugin:0.0.1-SNAPSHOT"

@@ -1,8 +1,8 @@
 package com.github.gridlts.kanbanhub.error;
 
+import jakarta.annotation.Nullable;
 import org.immutables.value.Value;
 
-import javax.annotation.Nullable;
 
 @Value.Immutable
 @Value.Style(visibility = Value.Style.ImplementationVisibility.PUBLIC,

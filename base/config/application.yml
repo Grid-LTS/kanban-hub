@@ -15,7 +15,7 @@ spring:
     password: ""
     username: ""
   jpa:
-    database-platform: org.sqlite.hibernate.dialect.SQLiteDialect
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
     show-sql: false
     hibernate:
       ddl-auto: none
