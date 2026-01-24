@@ -4,18 +4,11 @@ import com.github.gridlts.kanbanhub.service.TaskDbRepo
 import org.springframework.stereotype.Component
 
 @Component
-class TaskUpdateService {
+class TaskUpdateService(
+    private val taskDbRepo: TaskDbRepo
+) {
 
-    TaskDbRepo taskDbRepo
-
-    TaskUpdateService(TaskDbRepo taskDbRepo) {
-        this.taskDbRepo = taskDbRepo
-    }
-
-    void update() {
+    fun update() {
         taskDbRepo.saveAllRecentTasksConsole()
     }
 }
-
-
-
