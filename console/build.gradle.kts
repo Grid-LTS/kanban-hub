@@ -48,3 +48,7 @@ tasks.build {
 tasks.bootJar {
     finalizedBy("copyConfig")
 }
+
+tasks.bootRun {
+    dependsOn("copyConfig")
+}

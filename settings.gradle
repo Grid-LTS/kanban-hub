@@ -1,9 +1,6 @@
 include ':api'
 project(':api').projectDir = new File('api')
 project(':api').name='api'
-include ':sources-api'
-project(':sources-api').projectDir = new File('sources-api')
-project(':sources-api').name='sources-api'
 include ':base'
 project(':base').projectDir = new File('base')
 project(':base').name='base'
