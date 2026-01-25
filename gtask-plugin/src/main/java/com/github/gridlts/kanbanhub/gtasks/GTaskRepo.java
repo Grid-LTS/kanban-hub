@@ -47,7 +47,7 @@ public class GTaskRepo implements ITaskResourceRepo {
         try {
             this.tasksService = this.gTasksApiService.instantiateGapiService(accessToken);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException();
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
