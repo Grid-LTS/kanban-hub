@@ -24,3 +24,7 @@ npm run unit
 # run all tests
 npm test
 ```
+
+### Maintenance
+Manage app config for Google API access
+https://console.cloud.google.com/apis/dashboard

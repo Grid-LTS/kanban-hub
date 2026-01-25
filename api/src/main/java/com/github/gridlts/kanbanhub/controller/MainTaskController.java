@@ -59,10 +59,16 @@ public class MainTaskController {
     }
 
     private ITaskResourceRepo retrieveResourceRepoById(String resourceId) {
-        if (!repos.containsKey(resourceId)) {
+        TaskResourceType taskResourceType;
+        try {
+            taskResourceType = TaskResourceType.getResourceType(resourceId);
+        } catch (Exception e) {
             throw new ResourceNotFoundException(resourceId);
         }
-        return repos.get(resourceId);
+        if (!repos.containsKey(taskResourceType)) {
+            throw new ResourceNotFoundException(resourceId);
+        }
+        return repos.get(taskResourceType);
     }
 
 }
