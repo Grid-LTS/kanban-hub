@@ -1,39 +1,34 @@
 <template>
   <div>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button ref="authorize_button" @click="handleAuthClick"
-            v-bind:class="classAuthorize">Sign In</button>
-    <button ref="signout_button" @click="handleSignoutClick"
-            v-bind:class="classSignout">Sign Out</button>
+    <div v-if="!isSignedIn" id="google-sign-in-button"></div>
+    <button v-if="isSignedIn" @click="$emit('sign-out')" class="sign-out-btn">Sign Out</button>
   </div>
 </template>
 
-<script>
+<script setup>
+defineProps({
+  isSignedIn: {
+    type: Boolean,
+    default: false,
+  },
+})
 
-export default {
-  name: 'Login',
-  props: ['isSignedIn'],
-  computed: {
-    classAuthorize() {
-      return {
-        show: !this.isSignedIn,
-        hide: this.isSignedIn,
-      };
-    },
-    classSignout() {
-      return {
-        show: this.isSignedIn,
-        hide: !this.isSignedIn,
-      };
-    },
-  },
-  methods: {
-    handleAuthClick() {
-      this.$gapi.login();
-    },
-    handleSignoutClick() {
-      this.$gapi.logout();
-    },
-  },
-};
+defineEmits(['sign-in', 'sign-out'])
 </script>
+
+<style scoped>
+.sign-out-btn {
+  padding: 8px 16px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sign-out-btn:hover {
+  background-color: #b71c1c;
+}
+</style>

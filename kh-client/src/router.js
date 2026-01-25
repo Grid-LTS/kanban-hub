@@ -1,15 +1,13 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import GoogleTasksList from './views/GoogleTaskLists';
+import { createRouter, createWebHistory } from 'vue-router'
+import GoogleTasksList from './views/GoogleTaskLists.vue'
 
-Vue.use(Router);
-
-export default new Router({
+export default createRouter({
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
-      name: 'Google Tasks',
+      name: 'GoogleTasks',
       component: GoogleTasksList,
     },
   ],
-});
+})
