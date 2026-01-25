@@ -27,8 +27,9 @@ const tasks = ref([])
 
 onMounted(async () => {
   try {
-    const headers = currentUser.value
-      ? { Authorization: `Bearer ${currentUser.value.access_token}` }
+    let token = gapi.client.getToken();
+    const headers = token.access_token
+      ? { Authorization: `Bearer ${token.access_token}` }
       : {}
 
     const response = await api.getGTaskTasksForList(props.taskList.id, { headers })

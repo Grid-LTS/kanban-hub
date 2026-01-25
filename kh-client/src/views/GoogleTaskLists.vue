@@ -25,9 +25,10 @@ const apiMessage = ref('')
 
 const listTaskLists = async () => {
   try {
+    let token = gapi.client.getToken();
     // Use the current user's auth token if available
-    const headers = currentUser.value
-      ? { Authorization: `Bearer ${currentUser.value.access_token}` }
+    const headers = token.access_token
+      ? { Authorization: `Bearer ${token.access_token}` }
       : {}
 
     const resp = await api.getGTaskLists({ headers })
@@ -41,8 +42,8 @@ const listTaskLists = async () => {
 
 const syncAllNewTaskUpdates = async () => {
   try {
-    const headers = currentUser.value
-      ? { Authorization: `Bearer ${currentUser.value.access_token}` }
+    const headers = currentUser.accessToken
+      ? { Authorization: `Bearer ${currentUser.accessToken}` }
       : {}
 
     await api.saveRecentGTaskCompleted({ headers })

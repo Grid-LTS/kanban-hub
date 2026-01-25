@@ -19,6 +19,10 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
+        changeOrigin: false,
+      },
+      '/google': {
+        target: 'https://tasks.googleapis.com',
         changeOrigin: true,
       },
     },

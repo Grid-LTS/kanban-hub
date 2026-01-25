@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <div v-if="!isSignedIn" id="google-sign-in-button"></div>
+    <button v-if="!isSignedIn"  id="google-sign-in-button" @click="$emit('sign-in')">Authorize</button>
     <button v-if="isSignedIn" @click="$emit('sign-out')" class="sign-out-btn">Sign Out</button>
   </div>
 </template>
