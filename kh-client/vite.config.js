@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import fs from 'fs'
 
 export default defineConfig({
   plugins: [vue()],
@@ -11,6 +12,10 @@ export default defineConfig({
   },
   server: {
     port: 8000,
+    https: {
+      key: fs.readFileSync('./cert.key'),
+      cert: fs.readFileSync('./cert.crt'),
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

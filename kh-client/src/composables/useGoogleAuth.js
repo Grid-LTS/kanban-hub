@@ -1,4 +1,4 @@
-import { ref, onMounted, getCurrentInstance } from 'vue'
+import { ref, onBeforeMount, getCurrentInstance } from 'vue'
 
 let gapiClient = null
 
@@ -6,10 +6,18 @@ export const useGoogleAuth = () => {
   const isSignedIn = ref(false)
   const currentUser = ref(null)
   const error = ref('')
-    const instance = getCurrentInstance()
+  const instance = getCurrentInstance()
   const gTaskConfig = instance?.appContext.config.globalProperties.$gTaskConfig
+
   const initializeGoogleAuth = async () => {
     return new Promise((resolve) => {
+      // Check if clientId is available
+      if (!gTaskConfig?.clientId) {
+        error.value = 'Google Client ID not configured. Please check your server configuration.'
+        resolve(null)
+        return
+      }
+
       // Load the Google Identity Services script
       const script = document.createElement('script')
       script.src = 'https://accounts.google.com/gsi/client'
@@ -21,7 +29,7 @@ export const useGoogleAuth = () => {
           try {
             // Initialize Google Sign-In
             window.google.accounts.id.initialize({
-              client_id: gTaskConfig.clientId, // Replace with your actual client ID
+              client_id: gTaskConfig.clientId,
               callback: handleCredentialResponse,
             })
 
@@ -90,7 +98,7 @@ export const useGoogleAuth = () => {
     currentUser.value = null
   }
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     gapiClient = await initializeGoogleAuth()
   })
 
