@@ -30,8 +30,8 @@ public class TodoTxtRepo implements ITaskResourceRepo {
     private final String completedTaskCommand;
     private final String pendingTaskCommand;
     // option -p prevents color encoded output
-    private static final String TASKS_CMD_FORMAT = "todo.sh -p listfile %s";
-    private static final String TASK_NOTE_CMD_FORMAT = "todo.sh note s %s";
+    private static final String TASKS_CMD_FORMAT = "todo-txt -p listfile %s";
+    private static final String TASK_NOTE_CMD_FORMAT = "todo-txt note s %s";
 
     private TodoTxtConfig todoTxtConfig;
 

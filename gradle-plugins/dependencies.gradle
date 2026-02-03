@@ -5,7 +5,6 @@ ext {
     hibernateVersion = "6.5.0.Final"
     orgImmutablesVersion = "2.12.1"
     openCSVVersion = "5.12.0"
-    hsqldbVersion = "2.7.4"
     jacksonVersion = "2.21"
     jacksonDataBindVersion = "2.21.0"
     logbackVersion = "1.5.25"
@@ -32,7 +31,6 @@ supportDependencies = [
         springBootStarterSecurity       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         springBootStarterActuator       : "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
         springSecurityOauth             : "org.springframework.security.oauth:spring-security-oauth2",
-        hsqlDb                          : "org.hsqldb:hsqldb:${hsqldbVersion}",
         liquibase                       : "org.liquibase:liquibase-core:${liquibaseVersion}",
         logback                         : "ch.qos.logback:logback-classic:${logbackVersion}",
         orgImmutables                   : "org.immutables:value:${orgImmutablesVersion}",

@@ -9,11 +9,6 @@ spring:
   config:
     use-legacy-processing: true
     additional-location: "file:./config"
-  datasource:
-    driver-class-name: org.hsqldb.jdbc.JDBCDriver
-    url: "jdbc:hsqldb:file:${application.fs.path}/db/kanban_hub"
-    password: ""
-    username: ""
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     show-sql: false
