@@ -30,17 +30,20 @@ public class TodoTxtRepo implements ITaskResourceRepo {
     private final String completedTaskCommand;
     private final String pendingTaskCommand;
     // option -p prevents color encoded output
-    private static final String TASKS_CMD_FORMAT = "todo-txt -p listfile %s";
-    private static final String TASK_NOTE_CMD_FORMAT = "todo-txt note s %s";
+    private final String tasksCmdFormat;
+    private final String tasksNoteCmdFormat;
 
-    private TodoTxtConfig todoTxtConfig;
+    private final TodoTxtConfig todoTxtConfig;
 
     public TodoTxtRepo(TodoTxtConfig appConfig) {
         this.todoTxtConfig = appConfig;
-        this.completedTaskCommand = String.format(TASKS_CMD_FORMAT,
+        this.tasksCmdFormat = appConfig.getTodoTxtCommand() + " -p listfile %s";
+        this.tasksNoteCmdFormat = appConfig.getTodoTxtCommand() + " note s %s";
+        this.completedTaskCommand = String.format(tasksCmdFormat,
                 appConfig.getDoneFileName());
-        this.pendingTaskCommand = String.format(TASKS_CMD_FORMAT,
+        this.pendingTaskCommand = String.format(tasksCmdFormat,
                 appConfig.getPendingFileName());
+
     }
 
     @Override
@@ -139,7 +142,7 @@ public class TodoTxtRepo implements ITaskResourceRepo {
                 TodoTxtDto todoTxtDto = mapTodoTxtDto(line);
                 newerThanDateTime = newerThanDateTime.toLocalDate().atStartOfDay(ZoneId.of("UTC"));
                 if (todoTxtDto.modified().isAfter(newerThanDateTime)
-                    || todoTxtDto.modified().isEqual(newerThanDateTime)) {
+                        || todoTxtDto.modified().isEqual(newerThanDateTime)) {
                     completedTodoTxt.add(todoTxtDto);
                 }
 
@@ -151,7 +154,7 @@ public class TodoTxtRepo implements ITaskResourceRepo {
     }
 
     private String readDescription(String taskId) {
-        String command = String.format(TASK_NOTE_CMD_FORMAT, taskId);
+        String command = String.format(tasksNoteCmdFormat, taskId);
         ProcessBuilder builder = new ProcessBuilder(
                 command.split(" "));
         builder.redirectErrorStream(true);

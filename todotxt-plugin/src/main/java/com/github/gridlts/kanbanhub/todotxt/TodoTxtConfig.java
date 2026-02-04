@@ -6,9 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource(value="${spring.config.additional-location}/custom.properties")
+@PropertySource(value = "${spring.config.additional-location}/custom.properties")
 @Data
 public class TodoTxtConfig {
+
+    @Value("${todotxt.command:todo-txt}")
+    private String todoTxtCommand;
 
     @Value("${todotxt.done.filename:done.txt}")
     private String doneFileName;
